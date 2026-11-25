@@ -1,4 +1,4 @@
-const CACHE = "cm-v4";
+const CACHE = "cm-v5";
 const SHELL = [
   "./",
   "index.html",
@@ -34,13 +34,14 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   const req = e.request;
-  if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
+  const url = new URL(req.url);
+  if (req.method !== "GET" || url.origin !== self.location.origin) return;
   e.respondWith(
     fetch(req)
       .then((res) => {
         if (res && res.ok) {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy));
+          caches.open(CACHE).then((c) => c.put(url.search ? url.origin + url.pathname : req, copy));
         }
         return res;
       })

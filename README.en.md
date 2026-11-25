@@ -86,6 +86,34 @@ To run the job now, open **Actions → TCMB kurları → Run workflow** on GitHu
 
 Optionally set `tcmbUrl` in `js/config.js` to the file's public address (e.g. `https://raw.githubusercontent.com/USER/calcula-monetam/main/data/tcmb.js`) so copies opened from disk always use the latest TCMB data.
 
+## Open via URL
+
+Query parameters open the app with a ready calculation:
+
+- `?q=` expression placed on the first line of the editor (up to 500 characters). It does not overwrite your saved worksheet; your first edit makes it yours.
+- `?to=` target currency (e.g. `TRY`, `EUR`).
+- `?lang=` interface language: `tr`, `en`, `ru`, `zh`, `es`, `de`, `fr`, `ar`, `ja`, `pt`. It is remembered only if you have not picked a language before; otherwise it applies to that visit only.
+- `?theme=` theme (e.g. `tabula`).
+
+Examples:
+
+```
+https://emirhan76demir.github.io/calcula-monetam/?q=10 dollars - 5 euro&to=USD&lang=en
+https://emirhan76demir.github.io/calcula-monetam/?q=10+dollars+-+5+euro&to=USD&lang=en
+https://emirhan76demir.github.io/calcula-monetam/?q=3%20g%20gold%20%2B%200.05%20btc&lang=en
+https://emirhan76demir.github.io/calcula-monetam/?lang=de&theme=pura
+```
+
+`+` means a space; write `%2B` for an addition sign. After `q` and `to` are applied they are removed from the address bar, and the tab title shows `expression = result`.
+
+## Search from the address bar
+
+The app publishes an OpenSearch description (`opensearch.xml`). In Chrome, visit the site once, then type the site name in the address bar and press **Tab** to calculate directly. If it is not added automatically, add it under **Settings → Search engine → Manage search engines and site search** with the URL `https://emirhan76demir.github.io/calcula-monetam/?q=%s`.
+
+## Search engines
+
+`sitemap.xml` lists the home page and its ten language versions (`?lang=`). GitHub Pages project sites serve `/robots.txt` only at the user root, so the `robots.txt` in this folder is informational. The site owner must verify the site in Google Search Console and submit `https://emirhan76demir.github.io/calcula-monetam/sitemap.xml` under **Sitemaps**.
+
 ## Themes and languages
 
 Themes: Moneta, Tabula, Spectra, Tessera, Pura (also via `?theme=tabula`).

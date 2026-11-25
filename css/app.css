@@ -208,6 +208,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 20px; letter-spacing: -.025em; line-height: 1; white-space: nowrap; }
 .mark { width: 38px; height: 38px; color: var(--rail-ink); flex: none; }
+.rail-head .brand { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.025em; text-transform: none; }
 
 .rail {
   background: var(--rail);
@@ -431,6 +432,18 @@ h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -.015em; }
 .help[open] summary svg { transform: rotate(90deg); }
 .help summary:hover { color: var(--ink); }
 .help p { max-width: 64ch; margin: 10px 0 0; line-height: 1.6; }
+.work { grid-template-rows: auto 1fr; }
+.work > .editor { grid-column: 1; grid-row: 1; }
+.work > .result { grid-column: 2; grid-row: 1 / span 2; }
+.about { grid-column: 1; max-width: 64ch; margin: 0 48px 48px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.6; color: var(--muted); }
+.about h2 { margin: 0 0 4px; font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--ink); }
+.about p { margin: 0; }
+.about ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+.about a { text-decoration: none; }
+.about a:hover code { border-color: var(--accent); }
+.about code { display: block; padding: 3px 9px; border: 1px solid var(--line); border-radius: var(--radius); font: 500 12.5px/1.4 var(--font); color: var(--ink); white-space: nowrap; }
+[data-theme="tabula"] .about h2, [data-theme="tessera"] .about h2 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; }
+.nojs { margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: var(--radius); font-size: 13.5px; color: var(--ink); }
 
 .result {
   position: sticky;
@@ -639,6 +652,7 @@ h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--ink); }
 [data-theme="tabula"] .tabs svg, [data-theme="tessera"] .tabs svg { width: 19px; height: 19px; }
 
 .app.wallet-mode .work { grid-template-columns: minmax(0, 1fr); }
+.app.wallet-mode .work > .about { grid-row: 2; }
 .app.wallet-mode .result { display: none; }
 .wallet { max-width: 760px; }
 .w-top { padding: 4px 0 6px; }
@@ -788,6 +802,9 @@ h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--ink); }
 
 @media (max-width: 1180px) {
   .work { grid-template-columns: minmax(0, 1fr); }
+  .work { grid-template-rows: none; }
+  .work > .editor, .work > .result, .work > .about { grid-column: 1; grid-row: auto; }
+  .about { margin-top: 24px; }
   .result { position: static; height: auto; overflow: visible; border-inline-start: 0; border-top: 1px solid var(--line); padding: 32px 48px 56px; }
   .res { max-width: 640px; }
 }
@@ -846,6 +863,7 @@ h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--ink); }
   .w-hist time { font-size: 12px; }
   .chip { height: 34px; }
   .ed-band { inset-inline: -8px; }
+  .about { margin: 0 16px 32px; }
   h1 { font-size: 19px; }
 }
 
@@ -854,7 +872,7 @@ h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--ink); }
 }
 
 @media print {
-  .rail, .bar, .icon-btn, .help { display: none !important; }
+  .rail, .bar, .icon-btn, .help, .about { display: none !important; }
   .app, .work { display: block; }
   .result { position: static; height: auto; border: 0; }
 }

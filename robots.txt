@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://emirhan76demir.github.io/calcula-monetam/sitemap.xml

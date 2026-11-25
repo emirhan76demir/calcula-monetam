@@ -54,6 +54,34 @@ Kendi kur girdiğiniz çiftte makas kura dahil sayılır ve ayrıca düşülmez;
 
 Uygulama bir web sunucusunda yayınlandığında editörün üstündeki bağlantı düğmesi, hesabınızı ve hedef para biriminizi içeren bir bağlantı kopyalar. Bağlantıyı açan kişi aynı hesapları görür.
 
+## Bağlantı ile açma
+
+Adrese eklenen parametrelerle uygulama hazır bir hesapla açılabilir:
+
+- `?q=` editörün ilk satırına yazılacak ifade (en fazla 500 karakter). Kayıtlı sayfanızın üzerine yazılmaz; ilk düzenlemenizle sizin olur.
+- `?to=` hedef para birimi (ör. `TRY`, `EUR`).
+- `?lang=` arayüz dili: `tr`, `en`, `ru`, `zh`, `es`, `de`, `fr`, `ar`, `ja`, `pt`. Daha önce dil seçmediyseniz kalıcı olur; seçtiyseniz yalnızca o ziyaret için geçerlidir.
+- `?theme=` tema (ör. `tabula`).
+
+Örnekler:
+
+```
+https://emirhan76demir.github.io/calcula-monetam/?q=10 dolar - 5 euro&to=TRY
+https://emirhan76demir.github.io/calcula-monetam/?q=10+dolar+-+5+euro&to=TRY
+https://emirhan76demir.github.io/calcula-monetam/?q=3%20gr%20alt%C4%B1n%20%2B%200%2C05%20btc&lang=tr
+https://emirhan76demir.github.io/calcula-monetam/?lang=de&theme=pura
+```
+
+`+` işareti boşluk sayılır; ifadede toplama için `+` kullanacaksanız `%2B` yazın. `q` ve `to` uygulandıktan sonra adres çubuğundan kaldırılır ve sekme başlığı `ifade = sonuç` olarak görünür.
+
+## Adres çubuğundan arama
+
+Uygulama bir OpenSearch tanımı (`opensearch.xml`) yayınlar. Chrome'da siteyi bir kez ziyaret ettikten sonra adres çubuğuna site adını yazıp **Tab** tuşuna basarak doğrudan hesap yapabilirsiniz. Otomatik eklenmezse **Ayarlar → Arama motoru → Arama motorlarını ve site aramasını yönet** bölümünden `https://emirhan76demir.github.io/calcula-monetam/?q=%s` adresiyle elle ekleyebilirsiniz.
+
+## Arama motorları
+
+`sitemap.xml` ana sayfayı ve on dil sürümünü (`?lang=`) listeler. GitHub Pages proje siteleri `/robots.txt` dosyasını yalnızca kullanıcı kökünde sunduğu için bu klasördeki `robots.txt` bilgi amaçlıdır. Site sahibi siteyi Google Search Console'da doğruladıktan sonra `https://emirhan76demir.github.io/calcula-monetam/sitemap.xml` adresini **Site haritaları** bölümünden göndermelidir.
+
 ## Masraflar
 
 Sol paneldeki **İşlem** seçimi yönü belirler. **Satıyorum** seçiliyse masraflar düşülür ve eline geçen tutar gösterilir. **Alıyorum** seçiliyse masraflar eklenir ve ödeyeceğin tutar gösterilir.

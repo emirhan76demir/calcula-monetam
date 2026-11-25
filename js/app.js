@@ -35,7 +35,10 @@
   const own = (o, k) => typeof k === "string" && Object.prototype.hasOwnProperty.call(o, k);
   const raw0 = store.get("cm.v1", {});
   const saved = raw0 && typeof raw0 === "object" && !Array.isArray(raw0) ? raw0 : {};
-  const lang0 = own(L, saved.lang) ? saved.lang : detectLang();
+  const query = new URLSearchParams(location.search);
+  const qLang = String(query.get("lang") || "").toLowerCase();
+  const urlLang = own(L, qLang) ? qLang : null;
+  const lang0 = urlLang || (own(L, saved.lang) ? saved.lang : detectLang());
   const s = Object.assign({
     lang: lang0,
     theme: own(THEMES, root.dataset.theme) ? root.dataset.theme : "moneta",
@@ -45,8 +48,9 @@
     custom: Object.assign({}, CM.PROFILES.bank),
     text: null
   }, saved);
-  const qTheme = new URLSearchParams(location.search).get("theme");
+  const qTheme = query.get("theme");
   if (own(THEMES, qTheme)) s.theme = qTheme;
+  if (urlLang) s.lang = urlLang;
   if (!own(THEMES, s.theme)) s.theme = "moneta";
   if (!own(L, s.lang)) s.lang = lang0;
   if (!own(CM.PROFILES, s.profile) && s.profile !== "custom") s.profile = "bank";
@@ -78,12 +82,20 @@
   let composing = false;
   let shared = false;
   let savedText = s.text;
+  let keepLang = urlLang && own(L, saved.lang) && saved.lang !== urlLang ? saved.lang : null;
+  let qExpr = "";
+  const baseTitle = document.title;
   const ac = { open: false, items: [], idx: 0, start: 0, end: 0 };
   const canvas = document.createElement("canvas").getContext("2d");
   const CHIP_BASE = ["USD", "EUR", "GBP", "TRY", "CHF", "JPY", "RUB", "CNY"];
   const CHIP_TAIL = ["GAU", "GAG", "BTC"];
 
-  const save = () => store.set("cm.v1", shared ? Object.assign({}, s, { text: savedText }) : s);
+  const save = () => {
+    const o = Object.assign({}, s);
+    if (shared) o.text = savedText;
+    if (keepLang) o.lang = keepLang;
+    store.set("cm.v1", o);
+  };
   const esc = (x) => String(x).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   function t(k, x) {
@@ -445,6 +457,40 @@
     } catch (e) {}
     try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
     return ok;
+  }
+
+  function loadQuery() {
+    const q = query.get("q");
+    const to = String(query.get("to") || "").toUpperCase();
+    if (q == null && !query.has("to")) return false;
+    if (/^[A-Z]{3,5}$/.test(to)) s.target = to;
+    const txt = String(q || "").replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069]/g, " ").trim().slice(0, 500).trim();
+    if (txt) {
+      if (!shared) savedText = s.text;
+      s.text = txt;
+      shared = true;
+      s.tab = "calc";
+      qExpr = txt;
+    }
+    const rest = new URLSearchParams(location.search);
+    rest.delete("q");
+    rest.delete("to");
+    const qs = rest.toString();
+    try { history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash); } catch (e) {}
+    return !!txt;
+  }
+
+  function renderTitle() {
+    if (!qExpr) return;
+    const p = lines[0];
+    const v = p && p.res && active === 0 ? $("res-val").textContent : "";
+    document.title = (v ? qExpr + " = " + v : qExpr) + " · Calcula Monetam";
+  }
+
+  function clearTitle() {
+    if (!qExpr) return;
+    qExpr = "";
+    document.title = baseTitle;
   }
 
   async function copyText(txt) {
@@ -1026,6 +1072,7 @@
     renderResult();
     renderWallet();
     renderStatus();
+    renderTitle();
   }
 
   async function refresh() {
@@ -1111,6 +1158,7 @@
     ta.addEventListener("input", (e) => {
       s.text = ta.value;
       shared = false;
+      clearTitle();
       active = caretLine();
       schedule(true);
       if (!e.isComposing) updateAc();
@@ -1294,7 +1342,7 @@
     $("profile").addEventListener("change", (e) => { s.profile = e.target.value; save(); fillFees(); renderResult(); });
     $("theme").addEventListener("change", (e) => { s.theme = e.target.value; save(); applyTheme(); renderEditor(); });
     $("lang").addEventListener("change", (e) => {
-      s.lang = e.target.value; save(); applyLang(); fillStatic(); histKey = ""; lastVal = ""; renderAll();
+      s.lang = e.target.value; keepLang = null; save(); applyLang(); fillStatic(); histKey = ""; lastVal = ""; renderAll();
     });
     document.querySelectorAll(".seg [data-dir]").forEach((b) => b.addEventListener("click", () => { s.dir = b.dataset.dir; save(); fillFees(); renderResult(); }));
     document.querySelector(".seg").addEventListener("keydown", (e) => {
@@ -1344,11 +1392,13 @@
 
   function init() {
     loadShare();
+    const fromQuery = loadQuery();
     $("share").hidden = !/^https?:$/.test(location.protocol);
     $("input").setAttribute("aria-autocomplete", "list");
     $("input").setAttribute("aria-controls", "ac");
     window.addEventListener("hashchange", () => {
       if (!loadShare()) return;
+      clearTitle();
       $("input").value = s.text;
       histKey = "";
       renderAll();
@@ -1360,12 +1410,13 @@
     bind();
     renderAll();
     setTab(s.tab);
-    if (s.tab === "calc" && matchMedia("(min-width: 761px)").matches) {
+    if (s.tab === "calc" && (fromQuery || matchMedia("(min-width: 761px)").matches)) {
       const end = s.text.split("\n")[0].length;
       $("input").setSelectionRange(end, end);
       $("input").focus();
       active = -1;
       setActive();
+      renderTitle();
     }
     if (stale()) refresh();
     if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
