@@ -1,0 +1,14 @@
+{
+  "name": "Calcula Monetam",
+  "short_name": "Monetam",
+  "description": "Multi-currency calculator with median rates from several sources, spread, commission and tax.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F3F3F0",
+  "theme_color": "#10302A",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

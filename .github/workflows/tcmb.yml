@@ -1,0 +1,36 @@
+name: TCMB kurları
+
+on:
+  schedule:
+    - cron: "45 12 * * 1-5"
+    - cron: "15 14 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tcmb
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Depoyu al
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: git clone --depth 1 "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" repo
+
+      - name: Kurları çek ve doğrula
+        working-directory: repo
+        run: node scripts/tcmb.mjs data/tcmb.js
+
+      - name: Değiştiyse kaydet
+        working-directory: repo
+        run: |
+          git add data/tcmb.js
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "TCMB kurları güncellendi"
+          git push

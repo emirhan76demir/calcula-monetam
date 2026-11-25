@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="tr" dir="ltr" data-theme="moneta">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calcula Monetam</title>
+<meta name="description" content="Para birimleri arasında hesap yapın; birden fazla kaynaktan medyan kur, makas, komisyon ve vergi dahil net tutar.">
+<meta name="theme-color" content="#10302A">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="css/app.css">
+<script>try{var s=JSON.parse(localStorage.getItem("cm.v1")||"{}");var t=new URLSearchParams(location.search).get("theme")||s.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"spectra":"moneta");document.documentElement.dataset.theme=t}catch(e){}</script>
+<script src="js/config.js" defer></script>
+<script src="js/i18n.js" defer></script>
+<script src="data/tcmb.js" defer></script>
+<script src="js/core.js" defer></script>
+<script src="js/app.js" defer></script>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <span class="brand"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><use href="#mark"/></svg><span>Calcula Monetam</span></span>
+    <button class="icon-btn" id="open-settings" type="button" aria-controls="rail" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sliders"/></svg><span class="sr" data-i="settings"></span></button>
+  </header>
+
+  <aside class="rail" id="rail" aria-label="">
+    <div class="rail-head">
+      <span class="brand"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><use href="#mark"/></svg><span>Calcula Monetam</span></span>
+      <button class="icon-btn rail-close" id="close-settings" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg><span class="sr" data-i="close"></span></button>
+    </div>
+
+    <label class="field">
+      <span class="lbl" data-i="target"></span>
+      <span class="sel"><select id="target"></select></span>
+    </label>
+
+    <div class="field">
+      <span class="lbl" id="dir-lbl" data-i="direction"></span>
+      <div class="seg" role="radiogroup" aria-labelledby="dir-lbl">
+        <button type="button" role="radio" data-dir="sell"><b data-i="sell"></b><small data-i="sellHint"></small></button>
+        <button type="button" role="radio" data-dir="buy"><b data-i="buy"></b><small data-i="buyHint"></small></button>
+      </div>
+    </div>
+
+    <label class="field">
+      <span class="lbl" data-i="profile"></span>
+      <span class="sel"><select id="profile"></select></span>
+    </label>
+
+    <div class="fees">
+      <label><span data-i="spread"></span><span class="in"><input id="f-spread" inputmode="decimal" autocomplete="off"><i>%</i></span></label>
+      <label><span data-i="commission"></span><span class="in"><input id="f-commission" inputmode="decimal" autocomplete="off"><i>%</i></span></label>
+      <label><span data-i="fixed"></span><span class="in"><input id="f-fixed" inputmode="decimal" autocomplete="off"><i id="fixed-unit"></i></span></label>
+      <label><span data-i="tax"></span><span class="in"><input id="f-tax" inputmode="decimal" autocomplete="off"><i>%</i></span></label>
+      <p class="note" data-i="feesNote"></p>
+    </div>
+
+    <details class="own" id="own">
+      <summary><span data-i="ownRates"></span><b id="own-count"></b><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+      <ul class="own-list" id="own-list"></ul>
+      <button type="button" class="add-btn" id="own-add"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i="ownAdd"></span></button>
+      <p class="note" data-i="ownHint"></p>
+    </details>
+
+    <div class="rail-foot">
+      <label class="field">
+        <span class="lbl" data-i="theme"></span>
+        <span class="sel"><select id="theme"></select></span>
+      </label>
+      <label class="field">
+        <span class="lbl" data-i="language"></span>
+        <span class="sel"><select id="lang"></select></span>
+      </label>
+      <p class="note" data-i="disclaimer"></p>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <main class="work">
+    <section class="editor">
+      <div class="sec-head">
+        <div class="tabs" role="tablist">
+          <button type="button" role="tab" id="tab-calc" aria-controls="calc-panel" aria-selected="true"><span data-i="editor"></span></button>
+          <button type="button" role="tab" id="tab-wallet" aria-controls="wallet-panel" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wallet"/></svg><span data-i="wallet"></span></button>
+        </div>
+        <span class="status" id="status" role="status"></span>
+        <button class="icon-btn" id="share" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-link"/></svg><span class="sr" data-i="share"></span></button>
+        <button class="icon-btn" id="refresh" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-refresh"/></svg><span class="sr" data-i="refresh"></span></button>
+      </div>
+      <div id="calc-panel" role="tabpanel" aria-labelledby="tab-calc">
+      <div class="chips" id="chips" role="toolbar"></div>
+      <div class="ops" id="ops" role="toolbar">
+        <button type="button" data-op="+">+</button>
+        <button type="button" data-op="-">−</button>
+        <button type="button" data-op="*">×</button>
+        <button type="button" data-op="/">÷</button>
+        <button type="button" data-op="(">(</button>
+        <button type="button" data-op=")">)</button>
+        <button type="button" data-op="%">%</button>
+      </div>
+      <div class="ed" id="ed">
+        <ul class="ac" id="ac" role="listbox" hidden></ul>
+        <div class="ed-band" id="band" aria-hidden="true"></div>
+        <pre class="ed-hl" id="hl" aria-hidden="true"></pre>
+        <textarea id="input" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" dir="ltr"></textarea>
+        <ol class="ed-out" id="out"></ol>
+      </div>
+      <details class="help">
+        <summary><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chev"/></svg><span data-i="help"></span></summary>
+        <p data-i="helpBody"></p>
+      </details>
+      </div>
+
+      <div class="wallet" id="wallet-panel" role="tabpanel" aria-labelledby="tab-wallet" hidden>
+        <div class="w-top">
+          <p class="w-label" data-i="walletTotal"></p>
+          <p class="w-total" id="w-total"></p>
+          <div class="strip" id="w-strip"></div>
+        </div>
+        <form class="w-form" id="w-form" autocomplete="off">
+          <label class="w-field w-amt"><span class="sr" data-i="walletAmount"></span><input id="w-amt" inputmode="decimal" enterkeyhint="done" required></label>
+          <label class="w-field w-cur"><span class="sr" data-i="target"></span><span class="sel"><select id="w-cur"></select></span></label>
+          <label class="w-field w-note"><span class="sr" data-i="walletNote"></span><input id="w-note" maxlength="60" enterkeyhint="done"></label>
+          <button type="button" class="w-btn" id="w-add"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i="walletAdd"></span></button>
+          <button type="button" class="w-btn primary" id="w-spend"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg><span data-i="walletSpend"></span></button>
+        </form>
+        <p class="w-empty" id="w-empty" data-i="walletEmpty"></p>
+        <div class="block" id="w-hold-block">
+          <h3 data-i="walletHoldings"></h3>
+          <ul class="w-hold" id="w-hold"></ul>
+        </div>
+        <div class="block" id="w-hist-block">
+          <h3 data-i="walletHistory"></h3>
+          <ul class="w-hist" id="w-hist"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="result" id="result" aria-live="polite">
+      <div class="empty" id="empty">
+        <h2 data-i="emptyTitle"></h2>
+        <p data-i="emptyBody"></p>
+      </div>
+      <div class="res" id="res" hidden>
+        <div class="res-top">
+          <p class="res-expr" id="res-expr" dir="ltr"></p>
+          <button class="icon-btn" id="copy" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg><span class="sr" data-i="copy"></span></button>
+        </div>
+        <p class="res-label" id="res-label"></p>
+        <p class="res-val" id="res-val"></p>
+        <p class="res-sub" id="res-sub"></p>
+
+        <div class="block" id="comp-block">
+          <h3 data-i="composition"></h3>
+          <div class="strip" id="strip"></div>
+          <ul class="legend" id="legend"></ul>
+        </div>
+
+        <dl class="brk" id="brk"></dl>
+
+        <div class="block" id="src-block">
+          <h3 data-i="sources"></h3>
+          <div class="src-list" id="src-list"></div>
+          <button type="button" class="add-btn ghost" id="own-edit"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i="ownEdit"></span></button>
+        </div>
+
+        <div class="block" id="hist-block">
+          <div class="block-head"><h3 data-i="history"></h3><span id="hist-chg"></span></div>
+          <div class="chart" id="chart"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 32 32"><path d="M16 7.34A10 10 0 0 1 16 24.66A10 10 0 0 1 16 7.34Z" style="fill:var(--accent)"/><circle cx="11" cy="16" r="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="21" cy="16" r="10" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4.5h-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 5.5v-.5a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 5v8A1.5 1.5 0 0 0 6 14.5h.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M5 7.5V7a2 2 0 0 1 2-2h9.5a1.5 1.5 0 0 1 1.5 1.5V8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><rect x="3.5" y="7.5" width="17" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M20.5 11.5h-4a2 2 0 0 0 0 4h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16.75" cy="13.5" r="1" fill="currentColor"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+</body>
+</html>
