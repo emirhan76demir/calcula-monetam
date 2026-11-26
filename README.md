@@ -129,7 +129,7 @@ The app publishes an OpenSearch description (`opensearch.xml`). In Chrome, visit
 
 ## Search engines
 
-`sitemap.xml` lists the home page and its ten language versions (`?lang=`). GitHub Pages project sites serve `/robots.txt` only at the user root, so the `robots.txt` in this folder is informational. The site owner must verify the site in Google Search Console and submit `https://emirhan76demir.github.io/calcula-monetam/sitemap.xml` under **Sitemaps**.
+`sitemap.xml` lists the home page and its ten language versions (`?lang=`). GitHub Pages project sites serve `/robots.txt` only at the user root, so the live `robots.txt` (pointing to this sitemap) and `llms.txt` are published from the [root site repository](https://github.com/emirhan76demir/emirhan76demir.github.io); the copies in this folder are for self-hosting. The site owner must verify the site in Google Search Console and submit `https://emirhan76demir.github.io/calcula-monetam/sitemap.xml` under **Sitemaps**.
 
 ## Themes and languages
 

@@ -84,7 +84,7 @@ Uygulama bir OpenSearch tanımı (`opensearch.xml`) yayınlar. Chrome'da siteyi 
 
 ## Arama motorları
 
-`sitemap.xml` ana sayfayı ve on dil sürümünü (`?lang=`) listeler. GitHub Pages proje siteleri `/robots.txt` dosyasını yalnızca kullanıcı kökünde sunduğu için bu klasördeki `robots.txt` bilgi amaçlıdır. Site sahibi siteyi Google Search Console'da doğruladıktan sonra `https://emirhan76demir.github.io/calcula-monetam/sitemap.xml` adresini **Site haritaları** bölümünden göndermelidir.
+`sitemap.xml` ana sayfayı ve on dil sürümünü (`?lang=`) listeler. GitHub Pages proje siteleri `/robots.txt` dosyasını yalnızca kullanıcı kökünde sunduğu için, canlı `robots.txt` (bu site haritasını gösterir) ve `llms.txt` [kök site deposundan](https://github.com/emirhan76demir/emirhan76demir.github.io) yayınlanır; bu klasördeki kopyalar kendi sunucusunda yayınlayanlar içindir. Site sahibi siteyi Google Search Console'da doğruladıktan sonra `https://emirhan76demir.github.io/calcula-monetam/sitemap.xml` adresini **Site haritaları** bölümünden göndermelidir.
 
 ## Masraflar
 
