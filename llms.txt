@@ -1,0 +1,35 @@
+# Calcula Monetam
+
+> Free multi-currency calculator. It does math across currencies in one line (e.g. "10 usd - 5 eur + 3 g gold"), uses the median of several free exchange-rate sources, and shows the net amount after spread, commission, fixed fee and tax. Runs entirely in the browser; no account, no ads, works offline.
+
+App: https://emirhan76demir.github.io/calcula-monetam/
+Source: https://github.com/emirhan76demir/calcula-monetam
+License: MIT
+
+## Open a calculation by URL
+
+- `?q=` prefills the editor with an expression and shows the result: https://emirhan76demir.github.io/calcula-monetam/?q=10+usd+-+5+eur
+- `?to=` sets the target currency (ISO code): `?q=100+eur&to=USD`
+- `?lang=` sets the interface language: tr, en, ru, zh, es, de, fr, ar, ja, pt
+- `?theme=` sets the theme: moneta, tabula, spectra, tessera, pura
+
+## Expression syntax
+
+- Currencies by code, symbol or name in 10 languages: `10 usd`, `$10`, `10 dollars`, `10 dolar`, `10 €`
+- Arithmetic and brackets: `+ - * / ( )`, also `x` between amounts
+- Percentages: `250 eur + 18%`, `10% of 2,800 try`
+- Convert a line: `1,500 try in usd`, `100 eur → gbp`, `= usd`
+- Gold and silver: `3 g gold`, `1 oz silver`, `10 g 22 ayar`
+- Turkish gold coins: `çeyrek`, `yarım altın`, `tam altın`, `ata altın`, `gremse`
+- Variables and labels: `salary = 2,400 eur`, `hotel: 120 eur`
+- Reverse calculation: `10,000 try net in usd` (amount needed to receive a net sum)
+
+## Rate sources
+
+Frankfurter (European Central Bank), ExchangeRate-API, Currency API, Gold API, and the Central Bank of Türkiye (updated on working days). Rates are informational and not live market quotes.
+
+## Docs
+
+- [README (English)](https://github.com/emirhan76demir/calcula-monetam/blob/main/README.md)
+- [User guide (English)](https://github.com/emirhan76demir/calcula-monetam/blob/main/GUIDE.md)
+- [Kullanım kılavuzu (Türkçe)](https://github.com/emirhan76demir/calcula-monetam/blob/main/KILAVUZ.md)
