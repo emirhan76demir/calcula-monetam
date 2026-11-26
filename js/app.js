@@ -957,6 +957,8 @@
     $("input").setAttribute("aria-label", t("editor"));
     $("ac").setAttribute("aria-label", t("suggestions"));
     $("ops").setAttribute("aria-label", t("ops"));
+    const about = document.querySelector(".about");
+    if (about) about.hidden = s.lang !== "tr";
   }
 
   function applyTheme() {

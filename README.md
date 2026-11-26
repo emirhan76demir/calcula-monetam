@@ -1,145 +1,146 @@
 # Calcula Monetam
 
-Para birimleri arasında hesap yapan, kurları birden fazla ücretsiz kaynaktan alıp ortanca (medyan) değeri kullanan, makas, komisyon, sabit ücret ve vergiyi hesaba katarak **eline geçecek** ya da **ödeyeceğin** net tutarı gösteren bir uygulama.
+**A multi-currency calculator that tells you what you actually get.** Type `10 usd - 5 eur` and see the result in any currency, using the median of several free rate sources — then the net amount after spread, commission, fixed fee and tax.
 
-```
-10 usd - 5 eur
-maaş = 2.400 eur
-maaş * 12 kaç dolar
-3 gr altın + 0,05 btc
-```
+**[Open the app →](https://emirhan76demir.github.io/calcula-monetam/)** · No install, no account, no ads, works offline · [Türkçe](README.tr.md) · [User guide](GUIDE.md)
 
-[English](README.en.md) · [Amaç ve kullanım kılavuzu](KILAVUZ.md)
+![Calcula Monetam: line-by-line currency calculator with fee breakdown and source comparison](docs/screenshot.png)
 
-## Kullanım
+<img src="docs/screenshot-mobile.png" alt="Calcula Monetam on a phone, Tabula theme" width="260" align="right">
 
-- `index.html` dosyasını çift tıklayarak açın. Kurulum, sunucu ya da internetten başka bir şey gerekmez.
-- Başkasıyla paylaşmak için klasörü olduğu gibi kopyalayın veya zipleyin.
-- Bir web sunucusunda yayınlandığında (ör. GitHub Pages, Netlify, Cloudflare Pages) tarayıcının "Uygulamayı yükle" seçeneğiyle masaüstüne ya da telefona kurulabilir ve çevrimdışı açılır.
+## Why
 
-## Yazım
+- **Mixed currencies in one line:** `10 usd - 5 eur`, `salary * 12 in usd`, `3 g gold + 0.05 btc`, variables, percentages.
+- **Honest rates:** median of Frankfurter (ECB), ExchangeRate-API, Currency API, Gold API and the Central Bank of Türkiye, with every source and its age shown.
+- **Real-world net:** spread, commission, fixed fee and tax for banks, exchange offices, card payments and crypto exchanges — or your own institution rate.
+- **Work backwards:** `10,000 try net in usd` tells you how much to exchange to receive an exact amount.
+- **Gold, silver and Turkish gold coins**, a travel **wallet**, 5 themes, 10 languages, installable PWA.
 
-| Yazdığınız | Anlamı |
+<br clear="right">
+
+
+## Use
+
+- Open `index.html`. No install, server or build step.
+- To share it, copy the folder as is.
+- Hosted on any static host (GitHub Pages, Netlify, Cloudflare Pages), it can be installed as an app and works offline.
+
+## Writing
+
+| You type | Meaning |
 |---|---|
-| `10 usd`, `$10`, `10 dolar`, `10 доллар`, `10美元` | Kod, simge ya da 10 dildeki adlar |
-| `+ - * / ( )` | Dört işlem ve parantez |
-| `250 eur + %18`, `250 eur - 10%` | Yüzde ekleme / çıkarma |
-| `1500 tl kaç dolar`, `100 eur in usd`, `→ gbp` | Satır sonunda hedef para birimi |
-| `3 gr altın`, `1 ons gümüş` | Gram ya da ons altın ve gümüş |
-| `3 çeyrek + 1 yarım altın`, `10 gr 22 ayar` | Ziynet altınları ve ayarlı altın |
-| `10.000 tl net kaç dolar` | Ters hesap: net tutar için gereken ya da alınabilecek döviz |
-| `maaş = 2.400 eur` | Değişken; sonraki satırlarda `maaş * 12` |
-| `otel: 120 eur` | Etiketli satır |
-| `# Tatil bütçesi` | Başlık satırı |
-| `10k usd` | 10.000 |
+| `10 usd`, `$10`, `10 dollar`, `10 доллар`, `10美元` | Codes, symbols or names in 10 languages |
+| `+ - * / ( )` | Arithmetic |
+| `250 eur + 18%`, `250 eur - 10%` | Add or subtract a percentage |
+| `1500 try in usd`, `→ gbp` | Target currency at the end of a line |
+| `3 g gold`, `1 oz silver` | Gold and silver by gram or troy ounce |
+| `3 çeyrek + 1 yarım altın`, `10 g 22 ayar` | Turkish gold coins and karat gold |
+| `10,000 try net in usd` | Reverse: currency needed, or affordable, for a net amount |
+| `salary = 2,400 eur` | Variable, usable on later lines |
+| `hotel: 120 eur` | Labelled line |
+| `# Trip budget` | Heading line |
+| `10k usd` | 10,000 |
 
-Sayılar seçili dilin biçimine göre okunur: Türkçede `2.400` iki bin dört yüz, `2,5` iki buçuktur.
+Numbers follow the selected language's format.
 
-Birimleri yazmak zorunda değilsiniz:
+You don't have to type units. The **quick buttons** above the editor insert one at the caret; the ones you use most move to the front. **Autocomplete** suggests currencies and your variables after a couple of letters (arrow keys, then Enter or Tab).
 
-- **Hızlı butonlar:** Editörün üstündeki düğmeler birimi imlecin olduğu yere ekler. En çok kullandıklarınız öne geçer; diğer tüm birimler **Diğer…** listesindedir.
-- **Otomatik tamamlama:** Birkaç harf yazınca (`do`, `eu`, `al`) öneriler açılır. Ok tuşlarıyla seçip Enter veya Tab ile ekleyin. Tanımladığınız değişkenler de önerilir.
+## Fees
 
-## Kasam
+**Selling** subtracts costs and shows what you receive. **Buying** adds them and shows what you pay.
 
-**Kasam** sekmesinde elindeki parayı birim birim tutarsın: başta **Ekle**, alışveriş yaptıkça **Harca**. Toplam değer, kalan miktarlar ve tarihli hareket geçmişi görünür. Seyahatte cebindeki parayı takip etmek için tasarlandı.
+- **Spread:** total buy/sell gap; half applies in your direction.
+- **Commission:** percentage.
+- **Fixed fee:** per transaction, in the target currency.
+- **Tax:** percentage of the gross amount.
 
-## Kendi kurların
+Fees apply only to the part converted into the target currency. Preset values are examples.
 
-Bankanızın ya da döviz bürosunun kurunu sol paneldeki **Kendi kurların** bölümüne girin (ör. `1 USD = 49,80 TRY`). Hesaplar bu kurla yapılır. Sağ paneldeki **Kendi kurunu gir** düğmesi, o an baktığınız kur çiftini tek tıkla bu tabloya ekler. Kaynaklar bölümünde **Senin kurun** satırı, kurunuzun piyasa ortancasından yüzde kaç saptığını gösterir. Kutucuğu kaldırarak bir kuru silmeden devre dışı bırakabilirsiniz.
+## My wallet
 
-Kendi kur girdiğiniz çiftte makas kura dahil sayılır ve ayrıca düşülmez; komisyon, sabit ücret ve vergi profildeki gibi uygulanır. Kurunuz yalnızca girdiğiniz çifte (ve tersine) uygulanır, diğer çiftler piyasa ortancasıyla hesaplanmaya devam eder.
+The **My wallet** tab tracks the cash you hold, currency by currency: **Add** at the start, **Spend** as you pay. It shows the total value, what's left in each currency and a dated activity log. It's built for keeping track of your money while travelling.
 
-## Paylaşma
+## Your rates
 
-Uygulama bir web sunucusunda yayınlandığında editörün üstündeki bağlantı düğmesi, hesabınızı ve hedef para biriminizi içeren bir bağlantı kopyalar. Bağlantıyı açan kişi aynı hesapları görür.
+Enter your bank's or exchange office's rate under **Your rates** (e.g. `1 USD = 49.80 TRY`). It applies only to that pair and its inverse; the spread counts as included, while commission, fees and tax still apply. **Set your rate** in the Sources section adds the pair you are looking at.
 
-## Bağlantı ile açma
+## Sources
 
-Adrese eklenen parametrelerle uygulama hazır bir hesapla açılabilir:
+| Source | Content | Updated |
+|---|---|---|
+| [Frankfurter](https://frankfurter.dev) | European Central Bank data, history | Daily on working days |
+| [ExchangeRate-API](https://www.exchangerate-api.com) | 160+ currencies | Daily |
+| [Currency API](https://github.com/fawazahmed0/exchange-api) | Fiat, gold, silver, crypto | Daily |
+| [Gold API](https://gold-api.com) | Gold and silver (troy ounce, USD) | Within minutes |
+| [Central Bank of Türkiye](https://www.tcmb.gov.tr) | Official TRY rates | Working days, via GitHub automation (below) |
 
-- `?q=` editörün ilk satırına yazılacak ifade (en fazla 500 karakter). Kayıtlı sayfanızın üzerine yazılmaz; ilk düzenlemenizle sizin olur.
-- `?to=` hedef para birimi (ör. `TRY`, `EUR`).
-- `?lang=` arayüz dili: `tr`, `en`, `ru`, `zh`, `es`, `de`, `fr`, `ar`, `ja`, `pt`. Daha önce dil seçmediyseniz kalıcı olur; seçtiyseniz yalnızca o ziyaret için geçerlidir.
-- `?theme=` tema (ör. `tabula`).
+Free sources are not live market data. Each source's value and age is shown.
 
-Örnekler:
+## How Central Bank of Türkiye rates arrive
+
+The Central Bank of Türkiye (TCMB) does not let browsers read its rate file, so the app never contacts it directly. It reads `data/tcmb.js` inside the project instead. That file always ships with the app, so it also works when `index.html` is opened from disk.
+
+On GitHub, the `.github/workflows/tcmb.yml` job fetches the TCMB file every working day at 12:45 and 14:15 UTC. `scripts/tcmb.mjs` validates it and, if it changed, commits it as `data/tcmb.js`. No server, account or key is involved; the job can only write to its own repository and uses no third-party actions.
+
+Validation:
+
+- Is the file in the expected format, dated within the last 10 days?
+- Does it have at least 10 currencies including USD and EUR, with consistent buy and sell values?
+- Did USD/TRY move more than 25% since the last record? If so, nothing is saved.
+
+The app adds two more safeguards. TCMB data older than 5 days is not used, and any value more than 5% away from the other sources is left out of the median.
+
+To run the job now, open **Actions → TCMB kurları → Run workflow** on GitHub. Without GitHub, `node scripts/tcmb.mjs` does the same on your computer.
+
+Optionally set `tcmbUrl` in `js/config.js` to the file's public address (e.g. `https://raw.githubusercontent.com/USER/calcula-monetam/main/data/tcmb.js`) so copies opened from disk always use the latest TCMB data.
+
+## Open via URL
+
+Query parameters open the app with a ready calculation:
+
+- `?q=` expression placed on the first line of the editor (up to 500 characters). It does not overwrite your saved worksheet; your first edit makes it yours.
+- `?to=` target currency (e.g. `TRY`, `EUR`).
+- `?lang=` interface language: `tr`, `en`, `ru`, `zh`, `es`, `de`, `fr`, `ar`, `ja`, `pt`. It is remembered only if you have not picked a language before; otherwise it applies to that visit only.
+- `?theme=` theme (e.g. `tabula`).
+
+Examples:
 
 ```
-https://emirhan76demir.github.io/calcula-monetam/?q=10 dolar - 5 euro&to=TRY
-https://emirhan76demir.github.io/calcula-monetam/?q=10+dolar+-+5+euro&to=TRY
-https://emirhan76demir.github.io/calcula-monetam/?q=3%20gr%20alt%C4%B1n%20%2B%200%2C05%20btc&lang=tr
+https://emirhan76demir.github.io/calcula-monetam/?q=10 dollars - 5 euro&to=USD&lang=en
+https://emirhan76demir.github.io/calcula-monetam/?q=10+dollars+-+5+euro&to=USD&lang=en
+https://emirhan76demir.github.io/calcula-monetam/?q=3%20g%20gold%20%2B%200.05%20btc&lang=en
 https://emirhan76demir.github.io/calcula-monetam/?lang=de&theme=pura
 ```
 
-`+` işareti boşluk sayılır; ifadede toplama için `+` kullanacaksanız `%2B` yazın. `q` ve `to` uygulandıktan sonra adres çubuğundan kaldırılır ve sekme başlığı `ifade = sonuç` olarak görünür.
+`+` means a space; write `%2B` for an addition sign. After `q` and `to` are applied they are removed from the address bar, and the tab title shows `expression = result`.
 
-## Adres çubuğundan arama
+## Search from the address bar
 
-Uygulama bir OpenSearch tanımı (`opensearch.xml`) yayınlar. Chrome'da siteyi bir kez ziyaret ettikten sonra adres çubuğuna site adını yazıp **Tab** tuşuna basarak doğrudan hesap yapabilirsiniz. Otomatik eklenmezse **Ayarlar → Arama motoru → Arama motorlarını ve site aramasını yönet** bölümünden `https://emirhan76demir.github.io/calcula-monetam/?q=%s` adresiyle elle ekleyebilirsiniz.
+The app publishes an OpenSearch description (`opensearch.xml`). In Chrome, visit the site once, then type the site name in the address bar and press **Tab** to calculate directly. If it is not added automatically, add it under **Settings → Search engine → Manage search engines and site search** with the URL `https://emirhan76demir.github.io/calcula-monetam/?q=%s`.
 
-## Arama motorları
+## Search engines
 
-`sitemap.xml` ana sayfayı ve on dil sürümünü (`?lang=`) listeler. GitHub Pages proje siteleri `/robots.txt` dosyasını yalnızca kullanıcı kökünde sunduğu için bu klasördeki `robots.txt` bilgi amaçlıdır. Site sahibi siteyi Google Search Console'da doğruladıktan sonra `https://emirhan76demir.github.io/calcula-monetam/sitemap.xml` adresini **Site haritaları** bölümünden göndermelidir.
+`sitemap.xml` lists the home page and its ten language versions (`?lang=`). GitHub Pages project sites serve `/robots.txt` only at the user root, so the `robots.txt` in this folder is informational. The site owner must verify the site in Google Search Console and submit `https://emirhan76demir.github.io/calcula-monetam/sitemap.xml` under **Sitemaps**.
 
-## Masraflar
+## Themes and languages
 
-Sol paneldeki **İşlem** seçimi yönü belirler. **Satıyorum** seçiliyse masraflar düşülür ve eline geçen tutar gösterilir. **Alıyorum** seçiliyse masraflar eklenir ve ödeyeceğin tutar gösterilir.
+Themes: Moneta, Tabula, Spectra, Tessera, Pura (also via `?theme=tabula`).
+Languages: Türkçe, English, Русский, 中文, Español, Deutsch, Français, العربية, 日本語, Português.
 
-- **Makas:** Alış ile satış arasındaki toplam fark; yarısı işlem yönüne uygulanır.
-- **Komisyon:** Yüzde olarak.
-- **Sabit ücret:** Hedef para biriminde, işlem başına.
-- **Vergi:** Yüzde olarak, brüt tutar üzerinden.
+## Privacy
 
-Masraflar yalnızca hedef para birimine çevrilen kısma uygulanır. Hazır profillerdeki oranlar örnektir; kendi bankanızın ya da büronuzun oranlarını girdiğinizde profil **Özel** olarak kaydedilir.
+Everything you type stays in your browser. The app only downloads rates from the sources above.
 
-## Kaynaklar
-
-| Kaynak | İçerik | Güncellenme |
-|---|---|---|
-| [Frankfurter](https://frankfurter.dev) | Avrupa Merkez Bankası verisi, geçmiş grafikler | İş günlerinde günlük |
-| [ExchangeRate-API](https://www.exchangerate-api.com) | 160+ para birimi | Günlük |
-| [Currency API](https://github.com/fawazahmed0/exchange-api) | Döviz, altın, gümüş, kripto | Günlük |
-| [Gold API](https://gold-api.com) | Altın ve gümüş (ons, USD) | Dakikalar içinde |
-| [TCMB](https://www.tcmb.gov.tr) | Resmi TL kurları | İş günlerinde, GitHub otomasyonuyla (aşağıya bakın) |
-
-Her kur, kaynakların ortancasıdır. Sağ panelde her kaynağın verdiği değer, ne kadar önce güncellendiği ve kaynaklar arasındaki fark görünür. Ücretsiz kaynaklar anlık piyasa verisi değildir.
-
-## Görünüm ve dil
-
-- **Temalar:** Moneta, Tabula, Spectra, Tessera, Pura. Adrese `?theme=tabula` eklenerek de seçilebilir.
-- **Diller:** Türkçe, English, Русский, 中文, Español, Deutsch, Français, العربية, 日本語, Português.
-
-## Gizlilik
-
-Yazdıklarınız ve ayarlarınız yalnızca kendi tarayıcınızda saklanır. Uygulama, yukarıdaki kaynaklardan kur indirmek dışında hiçbir yere veri göndermez.
-
-## TCMB kurları nasıl geliyor?
-
-TCMB'nin kur dosyası tarayıcıların okumasına izin vermez. Bu yüzden uygulama TCMB'ye doğrudan bağlanmaz; veriyi projenin içindeki `data/tcmb.js` dosyasından okur. Bu dosya her zaman uygulamayla birlikte gelir, bu sayede `index.html` diskten açıldığında da çalışır.
-
-Proje GitHub'a yüklendiğinde `.github/workflows/tcmb.yml` görevi, her iş günü Türkiye saatiyle 15:45 ve 17:15'te TCMB'nin kur dosyasını çeker. Dosya `scripts/tcmb.mjs` ile doğrulanır, değiştiyse `data/tcmb.js` olarak depoya kaydedilir. Hiçbir sunucu, hesap ya da anahtar gerekmez; görev yalnızca o depoya yazma iznine sahiptir ve dışarıdan hazır eklenti kullanmaz.
-
-Doğrulama adımları:
-
-- Dosya beklenen biçimde mi, tarih son 10 gün içinde mi?
-- USD ve EUR dahil en az 10 para birimi var mı, alış ve satış değerleri tutarlı mı?
-- USD/TRY bir önceki kayda göre %25'ten fazla oynamış mı? Oynamışsa dosya kaydedilmez.
-
-Uygulama tarafında iki koruma daha vardır. 5 günden eski TCMB verisi kullanılmaz. Diğer kaynaklardan %5'ten fazla sapan herhangi bir değer de ortancaya katılmaz.
-
-Görevi beklemeden çalıştırmak için GitHub'da **Actions → TCMB kurları → Run workflow** yolunu izleyin. Klasörü GitHub'sız kullanıyorsanız `node scripts/tcmb.mjs` komutu aynı işi bilgisayarınızda yapar.
-
-İsterseniz `js/config.js` içindeki `tcmbUrl` alanına güncel dosyanın adresini yazabilirsiniz (ör. `https://raw.githubusercontent.com/KULLANICI/calcula-monetam/main/data/tcmb.js`). Bu sayede diskten açılan kopyalar da her zaman en güncel TCMB verisini kullanır.
-
-## Testler
-
-Node.js 18 veya üstü ile:
+## Tests
 
 ```
 node --test
 ```
 
+## License
+
+MIT. Fonts are under the SIL Open Font License 1.1 (`fonts/OFL-*.txt`).
+
 ---
 
-Bilgi amaçlıdır, yatırım tavsiyesi değildir. Gerçek işlem kurları farklı olabilir.
+For information only, not financial advice. Real transaction rates may differ.
