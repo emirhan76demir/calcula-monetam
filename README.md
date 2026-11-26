@@ -1,6 +1,15 @@
 # Calcula Monetam
 
-**A multi-currency calculator that tells you what you actually get.** Type `10 usd - 5 eur` and see the result in any currency, using the median of several free rate sources — then the net amount after spread, commission, fixed fee and tax.
+**Do math across currencies in one line.** Most converters turn one currency into another. Calcula Monetam adds and subtracts them:
+
+```
+10 usd - 5 eur + 3 g gold             → TRY
+salary = 2,400 eur
+salary * 12 - 9,000 usd in gbp        → GBP
+1,000 eur in quarter gold             → Turkish gold coins
+```
+
+Rates are the median of five free sources, and every result also shows what you **actually get** after spread, commission, fixed fee and tax.
 
 **[Open the app →](https://emirhan76demir.github.io/calcula-monetam/)** · No install, no account, no ads, works offline · [Türkçe](README.tr.md) · [User guide](GUIDE.md)
 

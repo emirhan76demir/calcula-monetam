@@ -1,6 +1,8 @@
 # Calcula Monetam
 
-Para birimleri arasında hesap yapan, kurları birden fazla ücretsiz kaynaktan alıp ortanca (medyan) değeri kullanan, makas, komisyon, sabit ücret ve vergiyi hesaba katarak **eline geçecek** ya da **ödeyeceğin** net tutarı gösteren bir uygulama.
+**Farklı para birimlerini tek satırda topla, çıkar.** Çoğu döviz çevirici bir para birimini diğerine çevirir; Calcula Monetam ise onlarla hesap yapar. Dolar, euro, TL ve altını aynı satıra yaz, sonucu istediğin birimde gör.
+
+Kurlar beş ücretsiz kaynağın ortancasından (medyan) gelir; her sonuçta makas, komisyon, sabit ücret ve vergi sonrası **eline geçecek** ya da **ödeyeceğin** net tutar da görünür.
 
 ```
 10 usd - 5 eur
