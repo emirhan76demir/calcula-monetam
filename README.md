@@ -49,10 +49,15 @@ Rates are the median of five free sources, and every result also shows what you 
 | `hotel: 120 eur` | Labelled line |
 | `# Trip budget` | Note or heading line (via **+ Note**) |
 | `10k usd` | 10,000 |
+| `150 kuruş`, `50 cents`, `20 pence` | Subunits (a hundredth of the unit) |
 
 Numbers follow the selected language's format.
 
 You don't have to type units. The **quick buttons** above the editor insert one at the caret; the ones you use most move to the front. **Autocomplete** suggests currencies and your variables after a couple of letters (arrow keys, then Enter or Tab). A **spelling check** stops you from continuing after an unrecognised word (`dolr`) and lists the likely fixes; nothing is ever corrected without your choice.
+
+## Export
+
+The download button above the editor exports your calculations or wallet as CSV (opens in Excel, with the separator and decimal mark of the selected language) or prints the worksheet to paper or PDF. Everything is generated in the browser.
 
 ## Fees
 

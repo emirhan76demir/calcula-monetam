@@ -36,6 +36,7 @@ maaş * 12 kaç dolar
 | `otel: 120 eur` | Etiketli satır |
 | `# Tatil bütçesi` | Not ya da başlık satırı (**+ Not** düğmesiyle) |
 | `10k usd` | 10.000 |
+| `150 kuruş`, `50 cent`, `20 pence` | Alt birimler (birimin yüzde biri) |
 
 Sayılar seçili dilin biçimine göre okunur: Türkçede `2.400` iki bin dört yüz, `2,5` iki buçuktur.
 
@@ -58,6 +59,10 @@ Kendi kur girdiğiniz çiftte makas kura dahil sayılır ve ayrıca düşülmez;
 ## Paylaşma
 
 Uygulama bir web sunucusunda yayınlandığında editörün üstündeki bağlantı düğmesi, hesabınızı ve hedef para biriminizi içeren bir bağlantı kopyalar. Bağlantıyı açan kişi aynı hesapları görür.
+
+## Dışa aktarma
+
+Editörün üstündeki indirme düğmesiyle hesaplarınızı ya da Kasam hareketlerini CSV olarak (Excel'de açılır, ayırıcı ve ondalık işareti seçili dile göre) indirebilir, hesap sayfasını yazdırabilir ya da PDF olarak kaydedebilirsiniz. Dosyalar tarayıcıda oluşturulur.
 
 ## Bağlantı ile açma
 

@@ -188,7 +188,7 @@
       if (src.ok && src.R && (src.id === "frankfurter" || src.id === "erapi" || src.id === "tcmb" || src.proxy)) Object.keys(src.R).forEach((c) => fiat.add(c));
     });
     const codes = [...fiat].concat(CM.CRYPTO, ["XAU", "XAG"]).filter((c) => merged.R[c] || !data);
-    lex = CM.buildLexicon(L, codes.length ? codes : FAV.concat(["XAU", "XAG"]));
+    lex = CM.buildLexicon(L, codes.length ? codes : FAV.concat(["XAU", "XAG"]), s.lang);
     merged.fiat = fiat;
   }
 
@@ -371,7 +371,7 @@
       const fi = FAV.indexOf(code);
       const score = (mine.has(k) ? 60 : 0) + (k === code.toLowerCase() ? 40 : 0) + (s.usage[code] || 0) * 6 + (fi >= 0 ? 24 - fi : 0) - k.length;
       const prev = best.get(code);
-      if (!prev || prev.score < score) best.set(code, { k, code, score });
+      if (!prev || prev.score < score) best.set(code, { k, code, score, f: e.f });
     });
     const out = [...best.values()].sort((a, b) => b.score - a.score);
     const names = new Set();
@@ -392,7 +392,7 @@
 
   function drawAc() {
     const el = $("ac");
-    const side = (it) => (it.del ? "" : it.v ? t("variable") : it.code ? codeText(it.code) : "");
+    const side = (it) => (it.del ? "" : it.v ? t("variable") : it.code ? codeText(it.code) + (it.f ? " · 1/100" : "") : "");
     el.innerHTML = (ac.fix ? '<li class="ac-head" role="presentation">' + esc(t("unknownWord", ac.fix.w)) + "</li>" : "") +
       ac.items.map((it, i) =>
         '<li role="option" id="ac-' + i + '" aria-selected="' + (i === ac.idx) + '" data-n="' + i + '"' + (it.del ? ' class="ac-del"' : "") + "><b>" + esc(it.del ? t("removeWord") : it.k) + "</b><span>" +
@@ -536,7 +536,7 @@
       const score = -d * 100 + (mine.has(k) ? 30 : 0) + (code ? Math.min(s.usage[code] || 0, 10) * 3 + (fi >= 0 ? 24 - fi : 0) : 0) - k.length * 0.1;
       const id = code || k;
       const prev = best.get(id);
-      if (!prev || prev.score < score) best.set(id, { k, code, score });
+      if (!prev || prev.score < score) best.set(id, { k, code, score, f: e.f });
     });
     namesSet().forEach((n) => {
       const d = n.startsWith(p) ? 0.5 : CM.editDistance(p, n);
@@ -1129,6 +1129,92 @@
     document.querySelectorAll(".seg [data-dir]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.dir === s.dir)));
   }
 
+  function csvCell(v, text) {
+    let x = v == null ? "" : String(v);
+    if (text && /^[=+\-@\t\r]/.test(x)) x = "'" + x;
+    return /[",;\n\r]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x;
+  }
+
+  function csvNum(v) {
+    if (!isFinite(v)) return "";
+    const r = new Intl.NumberFormat("en-US", { useGrouping: false, maximumSignificantDigits: 12 }).format(v);
+    return fmt.dec === "," ? r.replace(".", ",") : r;
+  }
+
+  function stamp(d, withTime) {
+    const p = (n) => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + (withTime ? " " + p(d.getHours()) + ":" + p(d.getMinutes()) : "");
+  }
+
+  function download(name, rows) {
+    const sep = fmt.dec === "," ? ";" : ",";
+    const body = "﻿" + rows.map((r) => r.join(sep)).join("\r\n") + "\r\n";
+    const url = URL.createObjectURL(new Blob([body], { type: "text/csv;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  function exportCalc() {
+    evalAll();
+    const raw = s.text.split("\n");
+    const rows = [[t("csvLine"), t("csvExpr"), t("mid"), t(s.dir === "buy" ? "net_buy" : "net_sell"), t("csvCur"), t("csvKind")].map((x) => csvCell(x, true))];
+    raw.forEach((line, i) => {
+      if (!line.trim()) return;
+      const p = lines[i];
+      let mid = "";
+      let net = "";
+      let cur = "";
+      let kind = "";
+      if (p && p.res && p.res.scalar) mid = csvNum(p.res.total);
+      else if (p && p.res) {
+        const nc = netCalc(p);
+        const f = nc ? null : CM.applyFees(p.res, feesIn(p.target), s.dir);
+        mid = csvNum(nc ? nc.mid : f.mid);
+        net = csvNum(nc ? nc.gross : f.net);
+        cur = p.target;
+        if (nc) kind = t(s.dir === "buy" ? "netBuy" : "netSell");
+      }
+      rows.push([String(i + 1), csvCell(line, true), mid, net, cur, csvCell(kind, true)]);
+    });
+    download("calcula-monetam-" + stamp(new Date()) + ".csv", rows);
+  }
+
+  function exportWallet() {
+    const rows = [[t("csvDate"), t("csvCur"), t("csvAmount"), t("walletNote").replace(/\s*[(（].*$/, "")].map((x) => csvCell(x, true))];
+    s.wallet.forEach((x) => rows.push([stamp(new Date(x.t), true), x.c, csvNum(x.a), csvCell(x.n, true)]));
+    download("calcula-monetam-" + t("wallet").toLowerCase().replace(/[^\p{L}\d]+/gu, "-") + "-" + stamp(new Date()) + ".csv", rows);
+  }
+
+  function printSheet() {
+    const fe = fees();
+    const parts = [stamp(new Date(), true), t("target") + ": " + s.target, t(s.dir === "buy" ? "buy" : "sell"), t("p_" + s.profile)];
+    if (fe.spread) parts.push(t("spread") + " %" + fe.spread);
+    if (fe.commission) parts.push(t("commission") + " %" + fe.commission);
+    if (fe.fixed) parts.push(t("fixed") + " " + fe.fixed);
+    if (fe.tax) parts.push(t("tax") + " %" + fe.tax);
+    $("print-meta").textContent = "Calcula Monetam · " + parts.join(" · ");
+    if (s.tab !== "calc") setTab("calc");
+    setTimeout(() => window.print(), 50);
+  }
+
+  function showExp(on) {
+    $("exp-menu").hidden = !on;
+    $("export").setAttribute("aria-expanded", String(on));
+    $("exp-menu").querySelector('[data-x="wallet"]').disabled = !s.wallet.length;
+    if (on) $("exp-menu").querySelector("button").focus();
+  }
+
+  function reportHref(sel) {
+    const u = new URLSearchParams({ template: "translation.yml", title: "[translation] [" + s.lang + "] ", language: s.lang });
+    if (sel) u.set("text", sel.slice(0, 400));
+    return CFG.issuesUrl + "?" + u.toString();
+  }
+
   function applyLang() {
     const l = L[s.lang];
     root.lang = s.lang;
@@ -1141,6 +1227,8 @@
     $("ac").setAttribute("aria-label", t("suggestions"));
     $("ops").setAttribute("aria-label", t("ops"));
     $("var-name").placeholder = t("varName");
+    $("report").hidden = !/^https:\/\//.test(CFG.issuesUrl || "");
+    if (!$("report").hidden) $("report").href = reportHref("");
     $("var-name").setAttribute("aria-label", t("varName"));
     const about = document.querySelector(".about");
     if (about) about.hidden = s.lang !== "tr";
@@ -1381,6 +1469,28 @@
       }
     });
     ta.addEventListener("beforeinput", gate);
+    $("export").addEventListener("click", () => showExp($("exp-menu").hidden));
+    $("exp-menu").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-x]");
+      if (!b) return;
+      showExp(false);
+      if (b.dataset.x === "csv") exportCalc();
+      else if (b.dataset.x === "wallet") exportWallet();
+      else printSheet();
+    });
+    $("exp-menu").addEventListener("keydown", (e) => {
+      const items = [...$("exp-menu").querySelectorAll("button:not([disabled])")];
+      const i = items.indexOf(document.activeElement);
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); items[(i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length].focus(); }
+      else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); showExp(false); $("export").focus(); }
+    });
+    document.addEventListener("pointerdown", (e) => { if (!$("exp-menu").hidden && !e.target.closest(".exp")) showExp(false); });
+    document.querySelector(".exp").addEventListener("focusout", (e) => { if (!$("exp-menu").hidden && !(e.relatedTarget && e.relatedTarget.closest(".exp"))) showExp(false); });
+    $("export").addEventListener("keydown", (e) => { if (e.key === "ArrowDown" && $("exp-menu").hidden) { e.preventDefault(); showExp(true); } });
+    $("report").addEventListener("pointerdown", () => {
+      const sel = String(window.getSelection ? window.getSelection() : "").replace(/\s+/g, " ").trim();
+      $("report").href = reportHref(sel);
+    });
     const varMsg = (m) => { $("var-msg").textContent = m; $("var-name").setAttribute("aria-invalid", m ? "true" : "false"); };
     const showVar = (on) => {
       $("var-form").hidden = !on;

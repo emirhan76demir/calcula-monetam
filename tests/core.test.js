@@ -761,3 +761,24 @@ test("audit cases: names, apostrophes and dative edge cases", () => {
   assert.equal(k[1].target, "EUR");
   assert.equal(money("100 евро сколько рублей", RU, "USD").target, "RUB");
 });
+
+test("subunits: kuruş, cent, pence, kopeks and language preference", () => {
+  near(money("150 kuruş", TR, "TRY").total, 1.5);
+  near(money("10 tl + 50 kuruş", TR, "TRY").total, 10.5);
+  near(money("50 cent", EN, "USD").total, 0.5);
+  near(money("20 pence", EN, "GBP").total, 0.2);
+  near(money("¢75", EN, "USD").total, 0.75);
+  near(money("300 копеек", RU, "RUB").total, 3);
+  near(money("kuruşu 50", TR, "TRY").total, 0.5);
+  const R2 = CM.normalize("USD", { EUR: 0.9, CHF: 0.8 });
+  const de = CM.buildLexicon(window.CM_I18N, Object.keys(R2), "de");
+  const p = CM.evalDocument("50 cent + 20 rappen", { lex: de, R: R2, target: "EUR", fmt: { dec: "," } })[0];
+  assert.deepEqual(Object.keys(p.value.m).sort(), ["CHF", "EUR"]);
+  assert.equal(CM.knownWord(lex, "kuruşu", null), true);
+});
+
+test("saved variables named like subunits keep working", () => {
+  const d = doc("cent = 5\ncent * 2\npens = 3\npens + 1", TR, "USD");
+  near(d[1].res.total, 10);
+  near(d[3].res.total, 4);
+});

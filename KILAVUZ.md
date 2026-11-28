@@ -107,6 +107,10 @@ Yalnızca `altın` yazarsanız gram kabul edilir. Ons için `ons` kelimesini ekl
 
 `çeyrek`, `yarım altın`, `tam altın`, `ata altın` (cumhuriyet) ve `gremse` tanınır. "Tam" ve "yarım" gündelik dilde de kullanıldığı için yanlarına "altın" yazılmalıdır. Hepsi 22 ayar kabul edilir ve içindeki saf altına göre hesaplanır (ör. çeyrek 1,75 gr). `10 gr 22 ayar` gibi yazımlarla 8, 14, 18, 21, 22 ve 24 ayar da hesaplanabilir. Kuyumcu fiyatı işçilik payı içerir; o fiyatla hesaplamak için **Kendi kurların** bölümünü kullanın.
 
+### Kuruş, cent ve diğer alt birimler
+
+`150 kuruş`, `10 tl + 50 kuruş`, `50 cent`, `20 pence`, `300 копеек`, `10 Rappen` gibi yazımlar birimin yüzde biri olarak hesaplanır. `cent` sözcüğü seçili dile göre yorumlanır: Türkçe ve İngilizcede ABD senti, Almanca, Fransızca, İspanyolca ve Portekizcede euro senti sayılır. Emin olmak için `euro cent` yazabilirsiniz.
+
 ### Değişkenler
 
 Bir değeri isimlendirip sonraki satırlarda kullanabilirsiniz. Editörün altındaki **+ Değişken** düğmesine basın, adı yazıp **Ekle**'ye basın; `maaş = ` satırı eklenir, siz değeri yazarsınız. Ad harfle başlamalı, boşluk ve rakam içermemeli; bir para birimi adı (ör. `dolar`) ya da başka bir değişkenin adı olamaz.
@@ -241,6 +245,8 @@ Kasan da diğer her şey gibi yalnızca tarayıcında saklanır. Toplam değer, 
 - **Tema:** Sol panelin altından seçilir. **Moneta** (madeni para dolabı), **Tabula** (döviz bürosu panosu), **Spectra** (koyu, kaynak rayı öne çıkan), **Tessera** (uçak bileti kuponu) ve **Pura** (sade, klasik). Adres çubuğuna `?theme=tabula` ekleyerek de seçebilirsiniz.
 - **Dil:** Türkçe, English, Русский, 中文, Español, Deutsch, Français, العربية, 日本語, Português. Seçtiğiniz dil sayı biçimini de belirler. Para birimi adlarını hangi dilde yazdığınız fark etmez; hepsi tanınır.
 - **Paylaşım:** Uygulama bir web sitesinde yayınlanmışsa editörün üstündeki bağlantı düğmesi, hesaplarınızı içeren bir bağlantıyı kopyalar. Açan kişi aynı satırları görür; kendi kayıtlı hesapları silinmez.
+- **Dışa aktarma:** Editörün üstündeki indirme düğmesi üç seçenek sunar. **Hesaplar (CSV)** her satırı orta kur ve masraflar sonrası tutarla birlikte Excel'de açılabilen bir dosyaya yazar. **Kasam (CSV)** kasa hareketlerini indirir. **Yazdır / PDF** hesap sayfasını tarih ve masraf ayarlarıyla yazdırır; yazdırma penceresinde "PDF olarak kaydet" seçilebilir. Dosyalar bilgisayarınızda oluşturulur, hiçbir yere gönderilmez.
+- **Çeviri hatası bildir:** Sol panelde dil seçiminin altındaki bağlantı, GitHub'da hazır bir bildirim formu açar. Yanlış metni önce sayfada seçerseniz forma kendiliğinden eklenir. Bildirim göndermek için GitHub hesabı gerekir.
 
 ---
 

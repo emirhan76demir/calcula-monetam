@@ -1,0 +1,29 @@
+name: Translation error
+description: Report a wrong, unnatural or missing translation in the app.
+title: "[translation] "
+labels: ["translation"]
+body:
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      description: Interface language code (tr, en, ru, zh, es, de, fr, ar, ja, pt).
+    validations:
+      required: true
+  - type: textarea
+    id: text
+    attributes:
+      label: Text in the app
+      description: Copy the wrong text exactly as it appears.
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested text
+      description: How it should read. Leave empty if you are not sure.
+  - type: input
+    id: where
+    attributes:
+      label: Where it appears
+      description: For example the editor, the right panel, the wallet tab or the settings panel.

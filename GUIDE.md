@@ -107,6 +107,10 @@ Numbers are read using the rules of the language you selected. In English:
 
 The Turkish gold coins `çeyrek`, `yarım altın`, `tam altın`, `ata altın` / `cumhuriyet` and `gremse` are recognised. They are coins, not fractions of an ounce: in results they appear as, for example, "Turkish gold coin (quarter)". "Tam" and "yarım" are everyday Turkish words, so write "altın" after them. They count as 22 karat and are valued by their pure gold content (a quarter is 1.75 g). Karats 8, 14, 18, 21, 22 and 24 work as in `10 g 22 ayar`. Jewellers add a workmanship margin; use **Your rates** to calculate with their price.
 
+### Cents, pence and other subunits
+
+`150 kuruş`, `10 try + 50 kuruş`, `50 cents`, `20 pence`, `300 копеек` and `10 Rappen` count as a hundredth of the unit. The word `cent` follows the selected language: in English and Turkish it is a US cent, in German, French, Spanish and Portuguese a euro cent. Write `euro cent` to be explicit.
+
 ### Variables
 
 Name a value and use it on later lines. Press **+ Variable** below the editor, type a name and press **Add**; a `salary = ` line is inserted and you type the value. Names start with a letter and contain no spaces or digits; they can't be a currency name (e.g. `dollar`) or another variable's name.
@@ -239,6 +243,8 @@ Like everything else, your wallet is stored only in your browser. The total uses
 - **Theme:** Chosen at the bottom of the left panel: **Moneta** (coin cabinet), **Tabula** (exchange-office board), **Spectra** (dark, with the source rail in front), **Tessera** (airline ticket coupon) and **Pura** (plain, classic). You can also add `?theme=tabula` to the address.
 - **Language:** Türkçe, English, Русский, 中文, Español, Deutsch, Français, العربية, 日本語, Português. The language also sets the number format. It doesn't matter which language you write currency names in; all are recognised.
 - **Sharing:** When the app is published on a website, the link button above the editor copies a link containing your calculations. Whoever opens it sees the same lines; their own saved work is not deleted.
+- **Export:** The download button above the editor has three options. **Calculations (CSV)** writes every line with its mid-market and after-fees amount to a file that opens in Excel. **My wallet (CSV)** downloads your wallet activity. **Print / PDF** prints the worksheet with the date and fee settings; choose "Save as PDF" in the print dialog. Files are created on your device and sent nowhere.
+- **Report a translation error:** The link under the language picker opens a ready-made report form on GitHub. Select the wrong text on the page first and it is filled in for you. A GitHub account is needed to send it.
 
 ---
 

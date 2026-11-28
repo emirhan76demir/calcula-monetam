@@ -31,7 +31,7 @@
   const isWordy = (ch) => !!ch && /[\p{L}\p{N}_]/u.test(ch) && !reCJK.test(ch);
   const lower = (s) => s.replace(/İ/g, "i").toLowerCase();
 
-  function buildLexicon(i18n, codes) {
+  function buildLexicon(i18n, codes, pref) {
     const map = new Map();
     const add = (text, entry) => {
       const k = lower(String(text).normalize("NFC")).trim();
@@ -40,13 +40,20 @@
       const k2 = k.replace(/ı/g, "i");
       if (!map.has(k2)) map.set(k2, entry);
     };
+    const subs = (l) => {
+      const sub = (l && l.words && l.words.sub) || {};
+      Object.keys(sub).forEach((c) => sub[c].forEach((x) => add(x, { t: "cur", c, f: 0.01 })));
+    };
+    if (pref && i18n && i18n[pref]) subs(i18n[pref]);
     codes.forEach((c) => { if (!COINS[c]) add(c, { t: "cur", c }); });
+    add("¢", { t: "cur", c: "USD", f: 0.01 });
     Object.keys(SYMBOLS).forEach((s) => add(s, { t: "cur", c: SYMBOLS[s] }));
     Object.values(i18n || {}).forEach((lang) => {
       const w = lang.words || {};
       (w.cur && Object.keys(w.cur) || []).forEach((c) => {
         w.cur[c].forEach((x) => add(x, METAL_GRAM[c] ? { t: "metal", c } : { t: "cur", c }));
       });
+      subs(lang);
       (w.to || []).forEach((x) => add(x, { t: "to" }));
       (w.skip || []).forEach((x) => add(x, { t: "skip" }));
       (w.gram || []).forEach((x) => add(x, { t: "gram" }));
@@ -69,7 +76,8 @@
     add("=", { t: "eq" });
     const stems = new Set();
     const tr = (i18n && i18n.tr && i18n.tr.words && i18n.tr.words.cur) || {};
-    [].concat(...Object.values(tr), ...Object.values(COIN_WORDS), Object.keys(EXTRA_CUR)).forEach((x) => {
+    const trSub = (i18n && i18n.tr && i18n.tr.words && i18n.tr.words.sub) || {};
+    [].concat(...Object.values(tr), ...Object.values(trSub), ...Object.values(COIN_WORDS), Object.keys(EXTRA_CUR)).forEach((x) => {
       const k = lower(String(x)).trim();
       stems.add(k);
       stems.add(k.replace(/ı/g, "i"));
@@ -236,7 +244,8 @@
         }
         if (h.t === "skip") { i += hit.len; continue; }
         const word = low.substr(i, hit.len);
-        if (names && names.has(word) && (h.t === "to" || h.t === "gram" || h.t === "oz" || h.t === "net")) {
+        const named = (names && names.has(word)) || /^\s*=(?!>)/.test(text.slice(i + hit.len));
+        if (named && (h.t === "to" || h.t === "gram" || h.t === "oz" || h.t === "net" || (h.t === "cur" && h.f))) {
           out.push({ t: "id", v: word, raw: text.slice(i, i + hit.len), s: i, e: i + hit.len });
         } else if (h.t === "tocur") {
           out.push({ t: "to", s: i, e: i + 1 });
@@ -321,7 +330,7 @@
         return S(n);
       }
       if (is("metal")) return money(METAL_GRAM[next().c], n);
-      if (is("cur")) return money(next().c, n);
+      if (is("cur")) { const u = next(); return money(u.c, n * (u.f || 1)); }
       return S(n);
     }
 
@@ -331,8 +340,8 @@
       if (t.t === "num") { next(); return unitAfter(t.v); }
       if (t.t === "cur") {
         next();
-        if (is("num")) return money(t.c, next().v);
-        return money(t.c, 1);
+        if (is("num")) return money(t.c, next().v * (t.f || 1));
+        return money(t.c, t.f || 1);
       }
       if (t.t === "metal") {
         next();

@@ -112,6 +112,7 @@
         <span class="lbl" data-i="language"></span>
         <span class="sel"><select id="lang"></select></span>
       </label>
+      <a class="report" id="report" href="#" target="_blank" rel="noopener" hidden><span data-i="reportLang"></span><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       <p class="note" data-i="disclaimer"></p>
     </div>
   </aside>
@@ -125,6 +126,14 @@
           <button type="button" role="tab" id="tab-wallet" aria-controls="wallet-panel" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wallet"/></svg><span data-i="wallet"></span></button>
         </div>
         <span class="status" id="status" role="status"></span>
+        <div class="exp">
+          <button class="icon-btn" id="export" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="exp-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-down"/></svg><span class="sr" data-i="export"></span></button>
+          <div class="exp-menu" id="exp-menu" role="menu" hidden>
+            <button type="button" role="menuitem" data-x="csv" data-i="exportCsv"></button>
+            <button type="button" role="menuitem" data-x="wallet" data-i="exportWallet"></button>
+            <button type="button" role="menuitem" data-x="print" data-i="exportPrint"></button>
+          </div>
+        </div>
         <button class="icon-btn" id="share" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-link"/></svg><span class="sr" data-i="share"></span></button>
         <button class="icon-btn" id="refresh" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-refresh"/></svg><span class="sr" data-i="refresh"></span></button>
       </div>
@@ -141,6 +150,7 @@
         <button type="button" data-op="%">%</button>
       </div>
       <noscript><p class="nojs" lang="tr">Hesap makinesi JavaScript gerektirir. Kullanmak için tarayıcınızda JavaScript'i açın.</p></noscript>
+      <p class="print-meta" id="print-meta"></p>
       <div class="ed" id="ed">
         <ul class="ac" id="ac" role="listbox" hidden></ul>
         <span class="sr" id="ac-live" aria-live="polite"></span>
@@ -248,6 +258,7 @@
   <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M5 7.5V7a2 2 0 0 1 2-2h9.5a1.5 1.5 0 0 1 1.5 1.5V8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><rect x="3.5" y="7.5" width="17" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M20.5 11.5h-4a2 2 0 0 0 0 4h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16.75" cy="13.5" r="1" fill="currentColor"/></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 19h14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
