@@ -143,6 +143,8 @@ Türkçe ekler anlaşılır: `dolarım`, `euroyu`, `20liram`, `altınlarım` gib
 
 Altı dalgalı çizgili bir sözcüğe tıklayarak da düzeltme listesini açabilirsiniz.
 
+Parantezler de denetlenir: açık kalan bir parantez varsa sonuç sütununda "parantezi kapatın" yazar, açılmamış bir parantez kapatılamaz. İmleç bir parantezin yanındayken eşi vurgulanır.
+
 Telefonda birim butonlarının altında `+ − × ÷ ( ) %` tuşları da bulunur; klavye değiştirmeden işlem yazabilirsiniz.
 
 ---

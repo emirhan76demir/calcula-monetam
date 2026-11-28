@@ -79,6 +79,7 @@
   let histKey = "";
   let lastPair = null;
   let skipAc = false;
+  let pairKey = "";
   let composing = false;
   let shared = false;
   let savedText = s.text;
@@ -453,6 +454,62 @@
     return { w, s: a, e: b };
   }
 
+  function lineBounds(v, pos) {
+    const a = v.lastIndexOf("\n", pos - 1) + 1;
+    const b = v.indexOf("\n", pos);
+    return [a, b < 0 ? v.length : b];
+  }
+
+  function depthAt(str) {
+    let d = 0;
+    for (const ch of str) {
+      if (ch === "(" || ch === "（") d++;
+      else if ((ch === ")" || ch === "）") && d > 0) d--;
+      else if (ch === ")" || ch === "）") return -1;
+    }
+    return d;
+  }
+
+  function parenPair() {
+    const ta = $("input");
+    if (ta.selectionStart !== ta.selectionEnd) return null;
+    const v = ta.value;
+    const pos = ta.selectionStart;
+    const [ls, le] = lineBounds(v, pos);
+    if (freeLine(v, pos)) return null;
+    const line = v.slice(ls, le);
+    const open = (c) => c === "(" || c === "（";
+    const close = (c) => c === ")" || c === "）";
+    let at = pos - ls - 1;
+    if (!(open(line[at]) || close(line[at]))) at = pos - ls;
+    const c = line[at];
+    if (!(open(c) || close(c))) return null;
+    const step = open(c) ? 1 : -1;
+    let d = 0;
+    for (let i = at; i >= 0 && i < line.length; i += step) {
+      if (open(line[i])) d += step;
+      else if (close(line[i])) d -= step;
+      if (d === 0) return { n: v.slice(0, ls).split("\n").length - 1, a: Math.min(at, i), b: Math.max(at, i) };
+    }
+    return null;
+  }
+
+  let noteT = 0;
+  function flashNote(msg, start) {
+    closeAc();
+    Object.assign(ac, { open: true, items: [], idx: 0, start, end: start, fix: null });
+    const el = $("ac");
+    el.innerHTML = '<li class="ac-head" role="presentation">' + esc(msg) + "</li>";
+    el.classList.add("fix");
+    el.hidden = false;
+    const box = caretBox(start);
+    el.style.left = Math.max(0, Math.min(box.x, $("ed").clientWidth - el.offsetWidth)) + "px";
+    el.style.top = box.y + "px";
+    $("ac-live").textContent = msg;
+    clearTimeout(noteT);
+    noteT = setTimeout(() => { if (ac.open && !ac.items.length) closeAc(); }, 1800);
+  }
+
   function wordSpan(v, pos, right) {
     let a = pos;
     let b = pos;
@@ -503,6 +560,13 @@
     if (ta.selectionStart !== ta.selectionEnd) return;
     const v = ta.value;
     const pos = ta.selectionStart;
+    if ((key === ")" || key === "）") && !freeLine(v, pos)) {
+      const ls = lineBounds(v, pos)[0];
+      if (depthAt(v.slice(ls, pos)) <= 0) {
+        e.preventDefault();
+        return flashNote(t("noOpenParen"), pos);
+      }
+    }
     const sp = wordSpan(v, pos);
     if (sp && (key === ":" || key === "：") && !v.slice(v.lastIndexOf("\n", sp[0] - 1) + 1, sp[0]).trim()) return;
     const hit = sp && badWord(v, sp[0], sp[1]);
@@ -516,6 +580,10 @@
     const pos = ta.selectionStart;
     const v = ta.value;
     if (pos !== ta.selectionEnd || !pos || /[\p{L}_'’]/u.test(v[pos - 1])) return;
+    if ((v[pos - 1] === ")" || v[pos - 1] === "）") && !freeLine(v, pos - 1) && depthAt(v.slice(lineBounds(v, pos)[0], pos - 1)) <= 0) {
+      insertAt("", pos - 1, pos, true, true);
+      return flashNote(t("noOpenParen"), pos - 1);
+    }
     const sp = wordSpan(v.slice(0, pos - 1), pos - 1);
     if (sp && (v[pos - 1] === ":" || v[pos - 1] === "：") && !v.slice(v.lastIndexOf("\n", sp[0] - 1) + 1, sp[0]).trim()) return;
     const hit = sp && badWord(v, sp[0], sp[1]);
@@ -656,6 +724,8 @@
     let hl = "";
     let out = "";
     const hasRates = Object.keys(merged.R).length > 1;
+    const pair = parenPair();
+    pairKey = pair ? pair.n + ":" + pair.a + ":" + pair.b : "";
     raw.forEach((line, i) => {
       const p = lines[i] || { kind: "empty", tokens: [] };
       let h = "";
@@ -666,7 +736,7 @@
         if (p.labelEnd) { h += '<span class="t-lbl">' + esc(line.slice(0, p.labelEnd)) + "</span>"; pos = p.labelEnd; }
         p.tokens.forEach((tk, k) => {
           if (tk.s < pos) return;
-          const c = p.name && k === 0 && tk.t === "id" ? "t-var" : tokCls(tk, vars);
+          const c = (p.name && k === 0 && tk.t === "id" ? "t-var" : tokCls(tk, vars)) + (pair && pair.n === i && (tk.s === pair.a || tk.s === pair.b) ? " t-pair" : "");
           h += esc(line.slice(pos, tk.s)) + '<span class="' + c + '">' + esc(line.slice(tk.s, tk.e)) + "</span>";
           pos = tk.e;
         });
@@ -680,6 +750,7 @@
       if (p.res) r = p.res.scalar ? (p.value && p.value.k === "p" ? pct(p.value.n, 4) : plain(p.res.total)) : money(nc ? nc.gross : p.res.total, p.target);
       else if (p.kind === "error") {
         if (!hasRates && p.err.k === "rate") { r = "…"; cls = "wait"; }
+        else if (p.err.k === "syntax" && depthAt(line.slice(p.labelEnd || 0)) !== 0) { r = t(depthAt(line.slice(p.labelEnd || 0)) > 0 ? "closeParen" : "extraParen"); cls = "hint"; }
         else if (i === active && p.err.k === "syntax" && /[-+*/×÷(x]\s*$/i.test(line)) { r = t("continueHint"); cls = "hint"; }
         else { r = "·"; cls = "err"; }
       }
@@ -1210,7 +1281,11 @@
 
   function setActive() {
     const n = caretLine();
-    if (n === active) return;
+    if (n === active) {
+      const pr = parenPair();
+      if ((pr ? pr.n + ":" + pr.a + ":" + pr.b : "") !== pairKey) renderEditor();
+      return;
+    }
     active = n;
     renderEditor();
     renderResult();
@@ -1289,6 +1364,7 @@
     ta.addEventListener("compositionend", () => { composing = false; updateAc(); });
     ta.addEventListener("keydown", (e) => {
       if (!ac.open || e.isComposing || e.keyCode === 229) return;
+      if (!ac.items.length) { closeAc(); return; }
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
         ac.idx = (ac.idx + (e.key === "ArrowDown" ? 1 : -1) + ac.items.length) % ac.items.length;
@@ -1351,6 +1427,8 @@
       const b = e.target.closest("button[data-op]");
       if (!b) return;
       const op = b.dataset.op;
+      const at = ta.selectionStart;
+      if (op === ")" && !freeLine(ta.value, at) && depthAt(ta.value.slice(lineBounds(ta.value, at)[0], at)) <= 0) return flashNote(t("noOpenParen"), at);
       insertAt(op, ta.selectionStart, ta.selectionEnd, op === ")" || op === "%");
     });
     $("chips").addEventListener("pointerdown", (e) => { if (e.target.closest("button")) e.preventDefault(); });

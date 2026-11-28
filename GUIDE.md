@@ -141,6 +141,8 @@ The editor won't let you continue after a word it doesn't recognise. If you type
 
 Clicking a word with a wavy underline opens the same list.
 
+Brackets are checked too: if one is left open, the results column says "close the bracket", and you can't close a bracket that was never opened. With the caret next to a bracket, its partner is highlighted.
+
 On a phone, `+ − × ÷ ( ) %` keys appear below the unit buttons, so you don't have to switch keyboards.
 
 ---

@@ -1,4 +1,4 @@
-const CACHE = "cm-v6";
+const CACHE = "cm-v7";
 const SHELL = [
   "./",
   "index.html",

@@ -374,6 +374,7 @@ h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -.015em; }
 
 .t-op, .t-to, .t-unit, .t-lbl { color: var(--muted); }
 .t-var { color: var(--var); }
+.t-pair { color: var(--accent-ink); background: var(--band); border-radius: 3px; box-shadow: 0 0 0 1px var(--accent); }
 .t-bad { text-decoration: underline wavy var(--neg) 1px; text-underline-offset: 5px; }
 .t-cur { border-radius: 999px; color: var(--cur-ink, inherit); }
 
