@@ -713,3 +713,51 @@ test("extra currency names and multiply words in context", () => {
   const en = CM.evalDocument("10% of 2,800 try", { lex, R, target: "TRY", fmt: { dec: "." } });
   near(en[0].res.total, 280);
 });
+
+test("suffixed currency words resolve to their unit", () => {
+  assert.equal(CM.stemHit(lex, "dolarım").c, "USD");
+  assert.equal(CM.stemHit(lex, "euroyu").c, "EUR");
+  assert.equal(CM.stemHit(lex, "liram").c, "TRY");
+  assert.equal(CM.stemHit(lex, "dolr"), null);
+  near(money("dolar 10 - 20liram", TR, "TRY").total, 10 * 50.55 - 20);
+});
+
+test("known words gate typos but allow units, keywords and names", () => {
+  for (const w of ["dolar", "liram", "kaç", "in", "net", "g", "oz", "ayar", "k", "x", "yarım", "tam", "çeyrek"]) assert.equal(CM.knownWord(lex, w, null), true, w);
+  for (const w of ["dolr", "ero", "sterln", "xyz"]) assert.equal(CM.knownWord(lex, w, null), false, w);
+  assert.equal(CM.knownWord(lex, "maaş", new Set(["maaş"])), true);
+  assert.equal(CM.editDistance("dolr", "dolar"), 1);
+  assert.equal(CM.editDistance("uro", "ruo"), 1);
+  assert.ok(CM.editDistance("a", "abcdef") > 2);
+});
+
+test("Turkish dative suffix on the last unit sets the target", () => {
+  const a = money("50 euroyu dolara", TR, "TRY");
+  assert.equal(a.target, "USD");
+  near(a.total, 50 / 0.9107);
+  assert.equal(money("100 sterlini liraya", TR, "USD").target, "TRY");
+  assert.equal(money("10 dolarda", TR, "TRY").target, "TRY");
+});
+
+test("Turkish filler words after a conversion are ignored", () => {
+  assert.equal(money("100 dolar kaç tl eder", TR, "USD").target, "TRY");
+  assert.equal(money("100 dolar ne eder", TR, "TRY").target, "TRY");
+  assert.equal(money("100 euro kaç eder", TR, "TRY").target, "TRY");
+  assert.equal(CM.knownWord(lex, "eder", null), true);
+});
+
+test("audit cases: names, apostrophes and dative edge cases", () => {
+  const d = doc("yeni = 5 usd\nyeni * 2\nsole = 3\nsole * 2", TR, "USD");
+  near(d[1].res.total, 10);
+  near(d[3].res.total, 6);
+  assert.equal(money("100 tl'yi euroya", TR, "USD").target, "EUR");
+  assert.equal(money("100 usd'yi euroya", TR, "TRY").target, "EUR");
+  assert.equal(money("100 usd'ye", TR, "TRY").target, "TRY");
+  assert.equal(CM.knownWord(lex, "tl'yi", null), true);
+  assert.equal(CM.knownWord(lex, "sole", null), false);
+  const g = money("100 sterline", TR, "TRY");
+  assert.equal(g.target, "TRY");
+  const k = doc("kira = 5000 tl\nkira euroya", TR, "USD");
+  assert.equal(k[1].target, "EUR");
+  assert.equal(money("100 евро сколько рублей", RU, "USD").target, "RUB");
+});

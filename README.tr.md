@@ -32,9 +32,9 @@ maaş * 12 kaç dolar
 | `3 gr altın`, `1 ons gümüş` | Gram ya da ons altın ve gümüş |
 | `3 çeyrek + 1 yarım altın`, `10 gr 22 ayar` | Ziynet altınları ve ayarlı altın |
 | `10.000 tl net kaç dolar` | Ters hesap: net tutar için gereken ya da alınabilecek döviz |
-| `maaş = 2.400 eur` | Değişken; sonraki satırlarda `maaş * 12` |
+| `maaş = 2.400 eur` | Değişken (**+ Değişken** düğmesiyle); sonraki satırlarda `maaş * 12` |
 | `otel: 120 eur` | Etiketli satır |
-| `# Tatil bütçesi` | Başlık satırı |
+| `# Tatil bütçesi` | Not ya da başlık satırı (**+ Not** düğmesiyle) |
 | `10k usd` | 10.000 |
 
 Sayılar seçili dilin biçimine göre okunur: Türkçede `2.400` iki bin dört yüz, `2,5` iki buçuktur.
@@ -43,6 +43,7 @@ Birimleri yazmak zorunda değilsiniz:
 
 - **Hızlı butonlar:** Editörün üstündeki düğmeler birimi imlecin olduğu yere ekler. En çok kullandıklarınız öne geçer; diğer tüm birimler **Diğer…** listesindedir.
 - **Otomatik tamamlama:** Birkaç harf yazınca (`do`, `eu`, `al`) öneriler açılır. Ok tuşlarıyla seçip Enter veya Tab ile ekleyin. Tanımladığınız değişkenler de önerilir.
+- **Yazım denetimi:** Tanınmayan bir sözcükten (`dolr`) sonra devam edilemez; açılan listeden doğrusunu seçersiniz. Uygulama hiçbir sözcüğü kendiliğinden değiştirmez. Türkçe ekler (`dolarım`, `20liram`, `50 euroyu dolara`) anlaşılır.
 
 ## Kasam
 

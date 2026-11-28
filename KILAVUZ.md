@@ -109,7 +109,7 @@ Yalnızca `altın` yazarsanız gram kabul edilir. Ons için `ons` kelimesini ekl
 
 ### Değişkenler
 
-Bir değeri isimlendirip sonraki satırlarda kullanabilirsiniz:
+Bir değeri isimlendirip sonraki satırlarda kullanabilirsiniz. Editörün altındaki **+ Değişken** düğmesine basın, adı yazıp **Ekle**'ye basın; `maaş = ` satırı eklenir, siz değeri yazarsınız. Ad harfle başlamalı, boşluk ve rakam içermemeli; bir para birimi adı (ör. `dolar`) ya da başka bir değişkenin adı olamaz.
 
 ```
 maaş = 2.400 eur
@@ -126,7 +126,7 @@ uçak: 310 eur
 yemek: 25 eur * 5
 ```
 
-`#` ile başlayan satır başlıktır. `otel:` gibi iki nokta üst üsteyle biten sözcük etikettir; hesabı etkilemez.
+`#` ile başlayan satır not ya da başlıktır; **+ Not** düğmesi böyle bir satır ekler ve içine istediğinizi yazabilirsiniz. `otel:` gibi iki nokta üst üsteyle biten sözcük etikettir; hesabı etkilemez.
 
 ### Birimleri yazmadan girmek
 
@@ -134,6 +134,14 @@ yemek: 25 eur * 5
 - **Otomatik tamamlama:** Birkaç harf yazınca öneriler açılır (`do` → dolar, `al` → altın). Ok tuşlarıyla seçip **Enter** ya da **Tab** ile ekleyin, **Esc** ile kapatın. Tanımladığınız değişkenler de önerilir.
 
 Eklemeleri **Ctrl+Z** ile geri alabilirsiniz.
+
+### Yazım denetimi
+
+Editör tanımadığı bir sözcükten sonra devam etmenize izin vermez. Örneğin `dolr` yazıp boşluk, sayı, işlem işareti ya da Enter'a bastığınızda tuş işlenmez; sözcüğün altında **Tanınmadı: dolr** başlıklı bir liste açılır. Listeden doğrusunu (`dolar`) seçerseniz sözcük düzelir ve bastığınız tuş da yazılır; **Kelimeyi sil** sözcüğü kaldırır. Uygulama hiçbir sözcüğü kendiliğinden değiştirmez, seçimi her zaman size bırakır.
+
+Türkçe ekler anlaşılır: `dolarım`, `euroyu`, `20liram`, `altınlarım` gibi yazımlar çalışır. Satırın sonundaki birim yönelme ekiyle yazılırsa (`50 euroyu dolara`, `100 sterlini liraya`) hedef para birimi olur. `kaç tl eder`, `ne eder` gibi kalıplar da tanınır.
+
+Altı dalgalı çizgili bir sözcüğe tıklayarak da düzeltme listesini açabilirsiniz.
 
 Telefonda birim butonlarının altında `+ − × ÷ ( ) %` tuşları da bulunur; klavye değiştirmeden işlem yazabilirsiniz.
 
@@ -249,7 +257,7 @@ Hiçbir yere. Hesaplarınız, ayarlarınız ve kendi kurlarınız yalnızca tara
 TCMB kurlarını her iş günü öğleden sonra yayımlar. Uygulama bu veriyi doğrudan TCMB'den değil, proje içindeki ve her iş günü otomatik güncellenen bir dosyadan okur. Hafta sonu ve tatillerde son iş gününün kuru görünür; 5 günden eski TCMB verisi hiç kullanılmaz.
 
 **Ekranda "Tanınmayan ifade" yazıyor.**
-O satırda uygulamanın anlamadığı bir sözcük var; editörde dalgalı çizgiyle işaretlenir. Yazım hatası olabilir ya da değişken henüz tanımlanmamış olabilir.
+O satırda uygulamanın anlamadığı bir sözcük var; editörde dalgalı çizgiyle işaretlenir. Sözcüğe tıklayın ve listeden doğrusunu seçin. Bir değeri adlandırmak istiyorsanız **+ Değişken** düğmesini kullanın.
 
 **"Kur bulunamadı" yazıyor.**
 O para birimi için hiçbir kaynakta kur yok ya da kurlar henüz yüklenmedi. Sağ üstteki yenile düğmesine basın.
@@ -264,7 +272,7 @@ Tarayıcınızın site verilerini temizlediyseniz ya da gizli pencere kullandıy
 | Tuş | Ne yapar |
 |---|---|
 | **↑ / ↓** | Öneri listesinde gezinir |
-| **Enter / Tab** | Seçili öneriyi ekler |
+| **Enter / Tab** | Seçili öneriyi ya da düzeltmeyi ekler |
 | **Esc** | Öneri listesini ya da mobildeki ayar panelini kapatır |
 | **Ctrl+Z** | Son değişikliği geri alır |
 

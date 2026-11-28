@@ -109,7 +109,7 @@ The Turkish gold coins `çeyrek`, `yarım altın`, `tam altın`, `ata altın` / 
 
 ### Variables
 
-Name a value and use it on later lines:
+Name a value and use it on later lines. Press **+ Variable** below the editor, type a name and press **Add**; a `salary = ` line is inserted and you type the value. Names start with a letter and contain no spaces or digits; they can't be a currency name (e.g. `dollar`) or another variable's name.
 
 ```
 salary = 2,400 eur
@@ -126,7 +126,7 @@ flight: 310 eur
 food: 25 eur * 5
 ```
 
-A line starting with `#` is a heading. A word ending in a colon, like `hotel:`, is a label and doesn't affect the calculation.
+A line starting with `#` is a note or heading; the **+ Note** button adds one and you can write anything in it. A word ending in a colon, like `hotel:`, is a label and doesn't affect the calculation.
 
 ### Entering units without typing them
 
@@ -134,6 +134,12 @@ A line starting with `#` is a heading. A word ending in a colon, like `hotel:`, 
 - **Autocomplete:** Suggestions appear after a couple of letters (`do` → dollar, `go` → gold). Use the arrow keys, then **Enter** or **Tab** to insert; **Esc** closes the list. Your variables are suggested too.
 
 Insertions can be undone with **Ctrl+Z**.
+
+### Spelling check
+
+The editor won't let you continue after a word it doesn't recognise. If you type `dolr` and then a space, a digit, an operator or Enter, the key is held back and a list titled **Not recognised: dolr** opens under the word. Pick the right word (`dollar`) and it is fixed and your key is typed; **Delete word** removes it. The app never changes a word on its own; the choice is always yours.
+
+Clicking a word with a wavy underline opens the same list.
 
 On a phone, `+ − × ÷ ( ) %` keys appear below the unit buttons, so you don't have to switch keyboards.
 
@@ -249,7 +255,7 @@ Nowhere. Your calculations, settings and own rates are stored only in your brows
 The Central Bank of Türkiye publishes rates on working-day afternoons. The app reads them not from the bank directly but from a file inside the project that is updated automatically every working day. On weekends and holidays you see the last working day's rate; TCMB data older than 5 days is never used.
 
 **It says "Unrecognized term".**
-That line contains a word the app doesn't understand; it's underlined with a wavy line in the editor. It may be a typo, or a variable that hasn't been defined yet.
+That line contains a word the app doesn't understand; it's underlined with a wavy line in the editor. Click the word and pick the right one from the list. To name a value, use the **+ Variable** button.
 
 **It says "No rate found".**
 No source has a rate for that currency, or rates haven't loaded yet. Press the refresh button at the top right.
@@ -264,7 +270,7 @@ If you cleared your browser's site data or used a private window, your saved wor
 | Key | What it does |
 |---|---|
 | **↑ / ↓** | Move through suggestions |
-| **Enter / Tab** | Insert the selected suggestion |
+| **Enter / Tab** | Insert the selected suggestion or correction |
 | **Esc** | Close the suggestion list or the settings panel on mobile |
 | **Ctrl+Z** | Undo the last change |
 

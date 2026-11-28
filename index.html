@@ -143,10 +143,20 @@
       <noscript><p class="nojs" lang="tr">Hesap makinesi JavaScript gerektirir. Kullanmak için tarayıcınızda JavaScript'i açın.</p></noscript>
       <div class="ed" id="ed">
         <ul class="ac" id="ac" role="listbox" hidden></ul>
+        <span class="sr" id="ac-live" aria-live="polite"></span>
         <div class="ed-band" id="band" aria-hidden="true"></div>
         <pre class="ed-hl" id="hl" aria-hidden="true"></pre>
         <textarea id="input" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" dir="ltr"></textarea>
         <ol class="ed-out" id="out"></ol>
+      </div>
+      <div class="ed-tools">
+        <button type="button" class="tool" id="add-var" aria-expanded="false" aria-controls="var-form"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i="addVar"></span></button>
+        <button type="button" class="tool" id="add-note"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i="addNote"></span></button>
+        <form class="var-form" id="var-form" autocomplete="off" hidden>
+          <input id="var-name" maxlength="24" spellcheck="false" autocapitalize="off" aria-describedby="var-msg">
+          <button type="submit" class="tool on" data-i="varAdd"></button>
+          <span class="var-msg" id="var-msg" role="status"></span>
+        </form>
       </div>
       <details class="help">
         <summary><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chev"/></svg><span data-i="help"></span></summary>

@@ -45,14 +45,14 @@ Rates are the median of five free sources, and every result also shows what you 
 | `3 g gold`, `1 oz silver` | Gold and silver by gram or troy ounce |
 | `3 çeyrek + 1 yarım altın`, `10 g 22 ayar` | Turkish gold coins and karat gold |
 | `10,000 try net in usd` | Reverse: currency needed, or affordable, for a net amount |
-| `salary = 2,400 eur` | Variable, usable on later lines |
+| `salary = 2,400 eur` | Variable (via **+ Variable**), usable on later lines |
 | `hotel: 120 eur` | Labelled line |
-| `# Trip budget` | Heading line |
+| `# Trip budget` | Note or heading line (via **+ Note**) |
 | `10k usd` | 10,000 |
 
 Numbers follow the selected language's format.
 
-You don't have to type units. The **quick buttons** above the editor insert one at the caret; the ones you use most move to the front. **Autocomplete** suggests currencies and your variables after a couple of letters (arrow keys, then Enter or Tab).
+You don't have to type units. The **quick buttons** above the editor insert one at the caret; the ones you use most move to the front. **Autocomplete** suggests currencies and your variables after a couple of letters (arrow keys, then Enter or Tab). A **spelling check** stops you from continuing after an unrecognised word (`dolr`) and lists the likely fixes; nothing is ever corrected without your choice.
 
 ## Fees
 

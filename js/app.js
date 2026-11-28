@@ -239,13 +239,13 @@
     save();
   }
 
-  function insertAt(text, a, b, glue) {
+  function insertAt(text, a, b, glue, raw) {
     const ta = $("input");
     const v = ta.value;
     const before = v.slice(0, a);
     const after = v.slice(b);
-    const pre = !glue && before && !/[\s(]$/.test(before) ? " " : "";
-    const post = /^ /.test(after) ? "" : " ";
+    const pre = !raw && !glue && before && !/[\s(]$/.test(before) ? " " : "";
+    const post = raw || /^ /.test(after) ? "" : " ";
     const str = pre + text + post;
     ta.focus();
     ta.setSelectionRange(a, b);
@@ -382,28 +382,28 @@
   function closeAc() {
     if (!ac.open) return;
     ac.open = false;
+    ac.fix = null;
     $("ac").hidden = true;
+    $("ac").classList.remove("fix");
     $("input").removeAttribute("aria-activedescendant");
     renderResult();
   }
 
   function drawAc() {
     const el = $("ac");
-    el.innerHTML = ac.items.map((it, i) =>
-      '<li role="option" id="ac-' + i + '" aria-selected="' + (i === ac.idx) + '" data-n="' + i + '"><b>' + esc(it.k) + "</b><span>" +
-      esc(it.v ? t("variable") : codeText(it.code)) + "</span></li>").join("");
+    const side = (it) => (it.del ? "" : it.v ? t("variable") : it.code ? codeText(it.code) : "");
+    el.innerHTML = (ac.fix ? '<li class="ac-head" role="presentation">' + esc(t("unknownWord", ac.fix.w)) + "</li>" : "") +
+      ac.items.map((it, i) =>
+        '<li role="option" id="ac-' + i + '" aria-selected="' + (i === ac.idx) + '" data-n="' + i + '"' + (it.del ? ' class="ac-del"' : "") + "><b>" + esc(it.del ? t("removeWord") : it.k) + "</b><span>" +
+        esc(side(it)) + "</span></li>").join("");
+    el.classList.toggle("fix", !!ac.fix);
     $("input").setAttribute("aria-activedescendant", "ac-" + ac.idx);
   }
 
-  function updateAc() {
-    if (composing) return;
-    if (skipAc) return closeAc();
-    const hit = wordAtCaret();
-    const items = hit && lex ? suggest(hit.w) : [];
-    if (!items.length) return closeAc();
-    const keep = ac.open && ac.start === hit.start ? Math.min(ac.idx, items.length - 1) : 0;
-    Object.assign(ac, { open: true, items, idx: keep, start: hit.start, end: hit.end });
-    const box = caretBox(hit.start);
+  function showAc(items, start, end, fix) {
+    const keep = !fix && ac.open && !ac.fix && ac.start === start ? Math.min(ac.idx, items.length - 1) : 0;
+    Object.assign(ac, { open: true, items, idx: keep, start, end, fix: fix || null });
+    const box = caretBox(start);
     const el = $("ac");
     el.hidden = false;
     drawAc();
@@ -412,12 +412,123 @@
     el.style.top = box.y + "px";
   }
 
+  function updateAc() {
+    if (composing) return;
+    if (skipAc) return closeAc();
+    const hit = wordAtCaret();
+    const items = hit && lex ? suggest(hit.w) : [];
+    if (!items.length) return closeAc();
+    showAc(items, hit.start, hit.end);
+  }
+
   function acceptAc(i) {
     const it = ac.items[i];
     if (!it) return;
+    const fix = ac.fix;
+    const a = ac.start;
+    const b = ac.end;
     closeAc();
     if (it.code) bump(it.code);
-    insertAt(it.k, ac.start, ac.end, true);
+    if (!fix) return insertAt(it.k, a, b, true);
+    const v = $("input").value;
+    let from = a;
+    if (it.del) while (from > 0 && v[from - 1] === " " && (fix.key === " " || !fix.key)) from--;
+    insertAt((it.del ? "" : it.k) + fix.key, from, b, true, true);
+  }
+
+  const namesSet = () => new Set(lines.filter((l) => l && l.name).map((l) => l.name));
+
+  function freeLine(v, pos) {
+    const ls = v.lastIndexOf("\n", pos - 1) + 1;
+    if (/^\s*#/.test(v.slice(ls))) return true;
+    const p = lines[v.slice(0, pos).split("\n").length - 1];
+    return !!(p && (p.kind === "label" || (p.labelEnd && pos - ls <= p.labelEnd)));
+  }
+
+  function badWord(v, a, b) {
+    if (!lex || a === b || freeLine(v, a)) return null;
+    const w = v.slice(a, b);
+    if (/[぀-ヿ㐀-鿿]/.test(w)) return null;
+    if (CM.knownWord(lex, w, namesSet())) return null;
+    return { w, s: a, e: b };
+  }
+
+  function wordSpan(v, pos, right) {
+    let a = pos;
+    let b = pos;
+    while (a > 0 && /[\p{L}_'’]/u.test(v[a - 1])) a--;
+    if (right) while (b < v.length && /[\p{L}_'’]/u.test(v[b])) b++;
+    else if (/[\p{L}\d_]/u.test(v[pos] || "")) return null;
+    return [a, b];
+  }
+
+  function fixList(w) {
+    const p = w.replace(/İ/g, "i").toLowerCase().replace(/['’]/g, "");
+    const lim = p.length <= 4 ? 1 : 2;
+    const mine = new Set([].concat.apply([], Object.values((L[s.lang].words || {}).cur || {})));
+    const has = Object.keys(merged.R).length > 1;
+    const best = new Map();
+    lex.map.forEach((e, k) => {
+      if (e.t === "eq" || e.t === "bad" || !/^\p{L}/u.test(k) || /\d/.test(k) || k.length < 2) return;
+      const d = k.length > p.length && k.startsWith(p) ? 0.5 : CM.editDistance(p, k);
+      if (d > lim) return;
+      const cur = e.t === "cur" || e.t === "metal";
+      const code = cur ? (e.t === "metal" ? CM.METAL_GRAM[e.c] : e.c) : null;
+      if (cur && has && !merged.R[code]) return;
+      const fi = code ? FAV.indexOf(code) : -1;
+      const score = -d * 100 + (mine.has(k) ? 30 : 0) + (code ? Math.min(s.usage[code] || 0, 10) * 3 + (fi >= 0 ? 24 - fi : 0) : 0) - k.length * 0.1;
+      const id = code || k;
+      const prev = best.get(id);
+      if (!prev || prev.score < score) best.set(id, { k, code, score });
+    });
+    namesSet().forEach((n) => {
+      const d = n.startsWith(p) ? 0.5 : CM.editDistance(p, n);
+      if (d <= lim) best.set("v:" + n, { k: n, v: true, score: 50 - d * 100 });
+    });
+    return [...best.values()].sort((a, b) => b.score - a.score).slice(0, 5).concat([{ del: true, k: "" }]);
+  }
+
+  function openFix(hit, key) {
+    showAc(fixList(hit.w), hit.s, hit.e, { w: hit.w, key: key || "" });
+    $("ac-live").textContent = "";
+    requestAnimationFrame(() => { $("ac-live").textContent = t("unknownWord", hit.w); });
+  }
+
+  function gate(e) {
+    if (composing || skipAc || e.isComposing) return;
+    const type = e.inputType;
+    const key = type === "insertLineBreak" || type === "insertParagraph" ? "\n" : type === "insertText" && e.data && e.data.length === 1 ? e.data : null;
+    if (key == null || /[\p{L}_'’]/u.test(key)) return;
+    const ta = $("input");
+    if (ta.selectionStart !== ta.selectionEnd) return;
+    const v = ta.value;
+    const pos = ta.selectionStart;
+    const sp = wordSpan(v, pos);
+    if (sp && (key === ":" || key === "：") && !v.slice(v.lastIndexOf("\n", sp[0] - 1) + 1, sp[0]).trim()) return;
+    const hit = sp && badWord(v, sp[0], sp[1]);
+    if (!hit) return;
+    e.preventDefault();
+    openFix(hit, key);
+  }
+
+  function lateGate() {
+    const ta = $("input");
+    const pos = ta.selectionStart;
+    const v = ta.value;
+    if (pos !== ta.selectionEnd || !pos || /[\p{L}_'’]/u.test(v[pos - 1])) return;
+    const sp = wordSpan(v.slice(0, pos - 1), pos - 1);
+    if (sp && (v[pos - 1] === ":" || v[pos - 1] === "：") && !v.slice(v.lastIndexOf("\n", sp[0] - 1) + 1, sp[0]).trim()) return;
+    const hit = sp && badWord(v, sp[0], sp[1]);
+    if (hit) openFix(hit, "");
+  }
+
+  function clickFix() {
+    const ta = $("input");
+    if (ta.selectionStart !== ta.selectionEnd) return;
+    const v = ta.value;
+    const sp = wordSpan(v, ta.selectionStart, true);
+    const hit = sp && badWord(v, sp[0], sp[1]);
+    if (hit) openFix(hit, "");
   }
 
   function b64e(str) {
@@ -569,6 +680,7 @@
       if (p.res) r = p.res.scalar ? (p.value && p.value.k === "p" ? pct(p.value.n, 4) : plain(p.res.total)) : money(nc ? nc.gross : p.res.total, p.target);
       else if (p.kind === "error") {
         if (!hasRates && p.err.k === "rate") { r = "…"; cls = "wait"; }
+        else if (i === active && p.err.k === "syntax" && /[-+*/×÷(x]\s*$/i.test(line)) { r = t("continueHint"); cls = "hint"; }
         else { r = "·"; cls = "err"; }
       }
       const pick = i === active && p.res && !p.res.scalar
@@ -957,6 +1069,8 @@
     $("input").setAttribute("aria-label", t("editor"));
     $("ac").setAttribute("aria-label", t("suggestions"));
     $("ops").setAttribute("aria-label", t("ops"));
+    $("var-name").placeholder = t("varName");
+    $("var-name").setAttribute("aria-label", t("varName"));
     const about = document.querySelector(".about");
     if (about) about.hidden = s.lang !== "tr";
   }
@@ -1163,7 +1277,11 @@
       clearTitle();
       active = caretLine();
       schedule(true);
-      if (!e.isComposing) updateAc();
+      if (!e.isComposing) {
+        const typed = !skipAc && /^insert(Text|CompositionText|LineBreak|Paragraph)$/.test(e.inputType || "");
+        updateAc();
+        if (typed && !ac.open) lateGate();
+      }
       clearTimeout(saveT);
       saveT = setTimeout(save, 300);
     });
@@ -1186,8 +1304,38 @@
         closeAc();
       }
     });
+    ta.addEventListener("beforeinput", gate);
+    const varMsg = (m) => { $("var-msg").textContent = m; $("var-name").setAttribute("aria-invalid", m ? "true" : "false"); };
+    const showVar = (on) => {
+      $("var-form").hidden = !on;
+      $("add-var").setAttribute("aria-expanded", String(on));
+      if (on) { $("var-name").value = ""; varMsg(""); $("var-name").focus(); }
+    };
+    const addLine = (text) => {
+      const v = ta.value;
+      const pos = ta.selectionStart;
+      const ls = v.lastIndexOf("\n", pos - 1) + 1;
+      let le = v.indexOf("\n", pos);
+      if (le < 0) le = v.length;
+      if (!v.slice(ls, le).trim()) insertAt(text, ls, le, true, true);
+      else insertAt("\n" + text, le, le, true, true);
+    };
+    $("add-var").addEventListener("click", () => showVar($("var-form").hidden));
+    $("add-note").addEventListener("click", () => { showVar(false); addLine("# "); });
+    $("var-name").addEventListener("input", () => varMsg(""));
+    $("var-name").addEventListener("keydown", (e) => { if (e.key === "Escape") { e.preventDefault(); showVar(false); ta.focus(); } });
+    $("var-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const n = $("var-name").value.trim();
+      const low = n.replace(/İ/g, "i").toLowerCase();
+      if (!/^\p{L}[\p{L}_]{0,23}$/u.test(n)) return varMsg(t("nameBad"));
+      if ((lex && CM.knownWord(lex, low, null)) || namesSet().has(low)) return varMsg(t("nameTaken"));
+      showVar(false);
+      addLine(n + " = ");
+    });
     ta.addEventListener("blur", closeAc);
     ta.addEventListener("pointerdown", closeAc);
+    ta.addEventListener("click", clickFix);
     $("ac").addEventListener("pointerdown", (e) => e.preventDefault());
     $("ac").addEventListener("click", (e) => {
       const li = e.target.closest("li");

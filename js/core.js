@@ -48,6 +48,7 @@
         w.cur[c].forEach((x) => add(x, METAL_GRAM[c] ? { t: "metal", c } : { t: "cur", c }));
       });
       (w.to || []).forEach((x) => add(x, { t: "to" }));
+      (w.skip || []).forEach((x) => add(x, { t: "skip" }));
       (w.gram || []).forEach((x) => add(x, { t: "gram" }));
       (w.ounce || []).forEach((x) => add(x, { t: "oz" }));
       if (lang.dir === "rtl") {
@@ -66,9 +67,68 @@
     Object.keys(EXTRA_CUR).forEach((x) => add(x, { t: "cur", c: EXTRA_CUR[x] }));
     MUL_WORDS.forEach((x) => add(x, { t: "op", v: "*" }));
     add("=", { t: "eq" });
+    const stems = new Set();
+    const tr = (i18n && i18n.tr && i18n.tr.words && i18n.tr.words.cur) || {};
+    [].concat(...Object.values(tr), ...Object.values(COIN_WORDS), Object.keys(EXTRA_CUR)).forEach((x) => {
+      const k = lower(String(x)).trim();
+      stems.add(k);
+      stems.add(k.replace(/ı/g, "i"));
+    });
     let max = 0;
     map.forEach((_, k) => { if (k.length > max) max = k.length; });
-    return { map, max };
+    return { map, max, stems };
+  }
+
+  const SUFFIXES = ["lardan", "lerden", "ların", "lerin", "larda", "lerde", "ları", "leri", "lara", "lere", "ımız", "imiz", "umuz", "ümüz", "ınız", "iniz", "unuz", "ünüz", "lar", "ler", "dan", "den", "tan", "ten", "nın", "nin", "nun", "nün", "yla", "yle", "yı", "yi", "yu", "yü", "ya", "ye", "da", "de", "ta", "te", "ın", "in", "un", "ün", "ım", "im", "um", "üm", "sı", "si", "su", "sü", "es", "ı", "i", "u", "ü", "a", "e", "m", "n", "s"];
+
+  function stemHit(lex, word) {
+    if (!lex || !word || word.length < 4) return null;
+    const ok = (h, w) => h && (h.t === "cur" || h.t === "metal") && (!lex.stems || lex.stems.has(w));
+    const go = (w, depth) => {
+      const h = lex.map.get(w);
+      if (depth && ok(h, w)) return h;
+      if (depth >= 2) return null;
+      for (const sfx of SUFFIXES) {
+        if (w.length - sfx.length >= 3 && w.endsWith(sfx)) {
+          const r = go(w.slice(0, -sfx.length), depth + 1);
+          if (r) return r;
+        }
+      }
+      return null;
+    };
+    return go(word.replace(/['’]/g, ""), 0);
+  }
+
+  function editDistance(a, b) {
+    const m = a.length, n = b.length;
+    if (Math.abs(m - n) > 2) return 9;
+    const d = Array.from({ length: m + 1 }, (_, i) => [i].concat(new Array(n).fill(0)));
+    for (let j = 1; j <= n; j++) d[0][j] = j;
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        const c = a[i - 1] === b[j - 1] ? 0 : 1;
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
+        if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+      }
+    }
+    return d[m][n];
+  }
+
+  function knownWord(lex, word, names) {
+    const ap = String(word || "").search(/['’]/);
+    if (ap > 0) return knownWord(lex, String(word).slice(0, ap), names);
+    const w = lower(String(word || ""));
+    if (!w) return true;
+    if (names && names.has(w)) return true;
+    const h = lex && lex.map.get(w);
+    if (h && h.t !== "eq") return true;
+    if (/^(x|k|ayar|karat|carat|kt)$/.test(w)) return true;
+    if (lex && !lex.heads) {
+      lex.heads = new Set();
+      lex.map.forEach((_, k) => { const sp = k.indexOf(" "); if (sp > 0) lex.heads.add(k.slice(0, sp)); });
+    }
+    if (lex && lex.heads.has(w)) return true;
+    return !!stemHit(lex, w);
   }
 
   function lexAt(lex, low, raw, i) {
@@ -174,6 +234,7 @@
           i += hit.len;
           continue;
         }
+        if (h.t === "skip") { i += hit.len; continue; }
         const word = low.substr(i, hit.len);
         if (names && names.has(word) && (h.t === "to" || h.t === "gram" || h.t === "oz" || h.t === "net")) {
           out.push({ t: "id", v: word, raw: text.slice(i, i + hit.len), s: i, e: i + hit.len });
@@ -182,13 +243,17 @@
           out.push(Object.assign({ s: i + 1, e: i + hit.len }, h.inner));
         } else {
           const tok = Object.assign({ s: i, e: i + hit.len }, h);
+          if ((h.t === "cur" || h.t === "metal") && /^(euroya|avroya)$/.test(low.substr(i, hit.len))) tok.dat = true;
           if (tok.c === "JPY" && fmt && fmt.yen && /[¥￥]/.test(text[i])) tok.c = fmt.yen;
           out.push(tok);
         }
         i += hit.len;
         if ((text[i] === "'" || text[i] === "’") && reLetter.test(text[i + 1] || "")) {
+          const a0 = i;
           while (i < n && (text[i] === "'" || text[i] === "’" || reLetter.test(text[i]))) i++;
-          out[out.length - 1].e = i;
+          const last = out[out.length - 1];
+          last.e = i;
+          if (/^['’](y?[ae]|n[ae])$/.test(low.slice(a0, i))) last.dat = true;
         }
         continue;
       }
@@ -198,7 +263,9 @@
           if ((reCJK.test(text[j]) || reCJK.test(text[j - 1])) && lexAt(lex, low, text, j)) break;
           j++;
         }
-        out.push({ t: "id", v: low.slice(i, j), raw: text.slice(i, j), s: i, e: j });
+        const word = low.slice(i, j);
+        const stem = (names && names.has(word)) || /^\s*=(?!>)/.test(text.slice(j)) ? null : stemHit(lex, word);
+        out.push(stem ? Object.assign({ s: i, e: j, dat: /(?<![dtl])y?[ae]$/.test(word) }, stem) : { t: "id", v: word, raw: text.slice(i, j), s: i, e: j });
         i = j;
         continue;
       }
@@ -392,6 +459,7 @@
     if (!code) return { tokens, target: null };
     const before = tokens[cut - 1];
     if (before && (before.t === "to" || before.t === "eq")) return { tokens: tokens.slice(0, cut - 1), target: code };
+    if (last.dat && tokens.slice(0, cut).some((x) => x.t === "cur" || x.t === "metal" || x.t === "id")) return { tokens: tokens.slice(0, cut), target: code };
     return { tokens, target: null };
   }
 
@@ -733,7 +801,7 @@
 
   const CM = {
     GRAM, CRYPTO, SYMBOLS, METAL_GRAM, COINS, COIN_WORDS, FINE, PROFILES,
-    buildLexicon, tokenize, parseNumber, parseLine, evaluate, evalDocument, convert, applyFees,
+    buildLexicon, stemHit, knownWord, editDistance, tokenize, parseNumber, parseLine, evaluate, evalDocument, convert, applyFees,
     normalize, merge, fetchAll, sourceList, pairQuotes, pairRate, history, median, Err
   };
   root.CM = CM;
